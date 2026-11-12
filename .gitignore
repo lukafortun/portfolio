@@ -1,0 +1,17 @@
+# .NET
+bin/
+obj/
+*.user
+.vs/
+TestResults/
+
+# Node / Vite (see also frontend/.gitignore)
+node_modules/
+dist/
+
+# Misc
+.env
+.env.*
+!.env.example
+.DS_Store
+.idea/

@@ -1,0 +1,46 @@
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: portfolio
+      POSTGRES_USER: portfolio
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-portfolio_dev}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U portfolio -d portfolio"]
+      interval: 5s
+      retries: 10
+
+  api:
+    build: ./backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      # Trust X-Forwarded-For/Proto from nginx (needed for correct https redirect URIs behind a proxy).
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
+      ConnectionStrings__Default: "Host=db;Port=5432;Database=portfolio;Username=portfolio;Password=${POSTGRES_PASSWORD:-portfolio_dev}"
+      Database__MigrateOnStartup: "true"
+      Authentik__Authority: ${AUTHENTIK_AUTHORITY:-}
+      Authentik__ClientId: ${AUTHENTIK_CLIENT_ID:-}
+      Authentik__ClientSecret: ${AUTHENTIK_CLIENT_SECRET:-}
+    volumes:
+      - dataprotection:/home/app/.aspnet/DataProtection-Keys
+
+  web:
+    build: ./frontend
+    restart: unless-stopped
+    depends_on:
+      - api
+    ports:
+      - "${APP_PORT:-8080}:80"
+
+volumes:
+  pgdata:
+  dataprotection:

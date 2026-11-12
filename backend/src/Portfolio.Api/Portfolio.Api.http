@@ -1,0 +1,16 @@
+@api = http://localhost:5071
+
+GET {{api}}/api/health
+
+###
+GET {{api}}/api/projects
+
+###
+# Sign-in happens in the browser through Authentik (/api/auth/login), so this returns 401 here.
+GET {{api}}/api/auth/me
+
+###
+POST {{api}}/api/projects
+Content-Type: application/json
+
+{ "title": "Mon premier projet", "description": "Description...", "repoUrl": "https://github.com/moi/projet", "liveUrl": null }
