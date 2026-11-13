@@ -5,7 +5,7 @@ using Portfolio.Api.Repositories;
 
 namespace Portfolio.Api.Services;
 
-public class ExperienceService(IRepository<Experience> repository) : IExperienceService
+public class ExperienceService(IRepository<Experience> repository, ITagService tagService) : IExperienceService
 {
     public async Task<IReadOnlyList<ExperienceDto>> GetAllAsync(CancellationToken ct = default)
     {
@@ -22,6 +22,7 @@ public class ExperienceService(IRepository<Experience> repository) : IExperience
     {
         var experience = new Experience();
         request.ApplyTo(experience);
+        await tagService.SyncAsync(experience.Tags, request.Tags, ct);
         repository.Add(experience);
         await repository.SaveChangesAsync(ct);
         return experience.ToDto();
@@ -33,7 +34,9 @@ public class ExperienceService(IRepository<Experience> repository) : IExperience
         if (experience is null) return null;
 
         request.ApplyTo(experience);
+        await tagService.SyncAsync(experience.Tags, request.Tags, ct);
         await repository.SaveChangesAsync(ct);
+        await tagService.RemoveUnusedAsync(ct);
         return experience.ToDto();
     }
 
@@ -44,6 +47,7 @@ public class ExperienceService(IRepository<Experience> repository) : IExperience
 
         repository.Remove(experience);
         await repository.SaveChangesAsync(ct);
+        await tagService.RemoveUnusedAsync(ct);
         return true;
     }
 }

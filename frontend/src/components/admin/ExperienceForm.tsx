@@ -1,10 +1,11 @@
 import { useTranslation } from 'react-i18next'
 import type { Experience, ExperienceInput } from '../../api/content'
-import { readList, readLocalized, readText } from '../../lib/formData'
+import { readLocalized, readTags, readText } from '../../lib/formData'
 import { Field } from '../ui/Field'
 import { AdminForm } from './AdminForm'
 import { LocalizedField } from './LocalizedField'
 import styles from './ExperienceForm.module.css'
+import { TagInput } from './TagInput'
 
 type Props = {
   experience: Experience | null
@@ -21,7 +22,7 @@ function readInput(form: FormData): ExperienceInput {
     role: readLocalized(form, 'role'),
     location: readLocalized(form, 'location'),
     description: readLocalized(form, 'description'),
-    tags: readList(form, 'tags'),
+    tags: readTags(form, 'tags'),
   }
 }
 
@@ -55,8 +56,9 @@ export function ExperienceForm({ experience, onSubmit, onCancel }: Props) {
         rows={4}
         maxLength={2000}
       />
-      <Field label={t('form.tags')} hint={t('form.tagsHint')}>
-        <input name="tags" defaultValue={experience?.tags.join(', ')} placeholder="React, C#, Docker" />
+      {/* Same tags as the projects: suggestions come from both. */}
+      <Field as="div" label={t('form.tags')} hint={t('form.tagsHint', { max: 20 })}>
+        <TagInput name="tags" label={t('form.tags')} defaultValue={experience?.tags} max={20} />
       </Field>
     </AdminForm>
   )

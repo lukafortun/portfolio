@@ -1,0 +1,27 @@
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tag {
+  /* Above a card's stretched link, so each tag stays clickable on its own. */
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.12s;
+}
+/* Only the links react on hover (a tag without projects is plain text). */
+a.tag:hover { color: var(--accent); text-decoration: underline; }
+
+.hash { color: var(--accent); opacity: 0.7; }
+
+.active { color: var(--accent); font-weight: 600; }
+.active .hash { opacity: 1; }

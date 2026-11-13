@@ -1,0 +1,86 @@
+.wrapper { position: relative; }
+
+/* Looks like the other inputs (see Field.module.css), with the chips inside. */
+.box {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  min-height: 42px;
+  padding: 6px 8px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg);
+  cursor: text;
+  transition: border-color 0.12s, box-shadow 0.12s;
+}
+.box:focus-within { border-color: var(--accent); box-shadow: 3px 3px 0 var(--accent-dim); }
+
+.chips { display: contents; list-style: none; }
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+  padding: 1px 2px 1px 8px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface-2);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.hash { color: var(--accent); }
+
+.remove {
+  margin-left: 2px;
+  padding: 0 5px;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.remove:hover { color: var(--danger); }
+
+/* Higher specificity than ".field input" from Field.module.css: no border of its own. */
+.box .input {
+  flex: 1;
+  min-width: 120px;
+  padding: 3px 4px;
+  border: 0;
+  background: none;
+  box-shadow: none;
+}
+.box .input:focus { box-shadow: none; }
+.box .input:disabled { cursor: not-allowed; }
+
+.suggestions {
+  position: absolute;
+  z-index: 10;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 4px 0;
+  border: 1px solid var(--accent);
+  background: var(--surface);
+  box-shadow: 4px 4px 0 var(--accent-dim);
+  list-style: none;
+}
+
+.option {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 5px 12px;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.active { background: var(--accent); color: var(--on-accent); }
+.active .hash,
+.active .count { color: inherit; }
+
+.count { color: var(--muted); font-size: 0.75rem; }

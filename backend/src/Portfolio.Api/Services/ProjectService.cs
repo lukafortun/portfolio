@@ -4,7 +4,7 @@ using Portfolio.Api.Repositories;
 
 namespace Portfolio.Api.Services;
 
-public class ProjectService(IProjectRepository repository) : IProjectService
+public class ProjectService(IProjectRepository repository, ITagService tagService) : IProjectService
 {
     public async Task<IReadOnlyList<ProjectListItemDto>> GetAllAsync(string? language = null, CancellationToken ct = default)
     {
@@ -24,6 +24,7 @@ public class ProjectService(IProjectRepository repository) : IProjectService
     public async Task<ProjectDto> CreateAsync(ProjectRequest request, CancellationToken ct = default)
     {
         var project = request.ToEntity();
+        await tagService.SyncAsync(project.Tags, request.Tags, ct);
         await repository.AddAsync(project, ct);
         await repository.SaveChangesAsync(ct);
         return project.ToDto();
@@ -35,7 +36,10 @@ public class ProjectService(IProjectRepository repository) : IProjectService
         if (project is null) return null;
 
         request.ApplyTo(project);
+        await tagService.SyncAsync(project.Tags, request.Tags, ct);
         await repository.SaveChangesAsync(ct);
+        // A tag removed from the last thing using it is deleted.
+        await tagService.RemoveUnusedAsync(ct);
         return project.ToDto();
     }
 
@@ -46,6 +50,7 @@ public class ProjectService(IProjectRepository repository) : IProjectService
 
         repository.Remove(project);
         await repository.SaveChangesAsync(ct);
+        await tagService.RemoveUnusedAsync(ct);
         return true;
     }
 }

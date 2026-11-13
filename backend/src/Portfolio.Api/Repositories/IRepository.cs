@@ -1,8 +1,9 @@
 namespace Portfolio.Api.Repositories;
 
 /// <summary>
-/// Basic data access for simple entities (no relations to load).
+/// Basic data access for simple entities.
 /// Projects keep their own repository: they need Include() for their translations and slug lookups.
+/// Experience entries use ExperienceRepository, which also loads their tags.
 /// </summary>
 public interface IRepository<T> where T : class
 {

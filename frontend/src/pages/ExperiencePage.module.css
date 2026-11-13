@@ -56,18 +56,5 @@
   color: var(--muted);
 }
 
-.tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin: 14px 0 0;
-  padding: 0;
-  list-style: none;
-}
-.tags li {
-  padding: 1px 8px;
-  border: 1px solid var(--border-strong);
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: var(--muted);
-}
+/* The tags themselves are styled by TagList. */
+.tags { margin-top: 14px; }

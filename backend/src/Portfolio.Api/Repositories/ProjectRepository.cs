@@ -6,23 +6,27 @@ namespace Portfolio.Api.Repositories;
 
 public class ProjectRepository(AppDbContext db) : IProjectRepository
 {
-    // Include → SQL JOIN on ProjectTranslations, so each project comes with its translations.
-    public Task<List<Project>> GetAllAsync(CancellationToken ct = default) =>
+    // Each project comes with its translations and its tags (Include → SQL JOINs).
+    // AsSplitQuery: one SQL query per collection, instead of one JOIN that would repeat
+    // every translation for every tag (translations × tags rows per project).
+    private IQueryable<Project> WithDetails() =>
         db.Projects
-            .AsNoTracking()
             .Include(p => p.Translations)
+            .Include(p => p.Tags)
+            .AsSplitQuery();
+
+    public Task<List<Project>> GetAllAsync(CancellationToken ct = default) =>
+        WithDetails()
+            .AsNoTracking()
             .OrderByDescending(p => p.CreatedAt)
             .ToListAsync(ct);
 
     public Task<Project?> GetByIdAsync(int id, CancellationToken ct = default) =>
-        db.Projects
-            .Include(p => p.Translations)
-            .FirstOrDefaultAsync(p => p.Id == id, ct);
+        WithDetails().FirstOrDefaultAsync(p => p.Id == id, ct);
 
     public Task<Project?> GetBySlugAsync(string slug, CancellationToken ct = default) =>
-        db.Projects
+        WithDetails()
             .AsNoTracking()
-            .Include(p => p.Translations)
             .FirstOrDefaultAsync(p => p.Slug == slug, ct);
 
     public Task<bool> SlugExistsAsync(string slug, int? exceptId = null, CancellationToken ct = default) =>

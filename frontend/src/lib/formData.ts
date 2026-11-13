@@ -14,6 +14,11 @@ export function readLocalized(form: FormData, name: string): Localized {
   )
 }
 
+/** A TagInput's hidden field, "react docker" (or typed "react, docker") → ["react", "docker"]. The API normalizes them. */
+export function readTags(form: FormData, name: string) {
+  return readText(form, name).split(/[\s,]+/).filter(Boolean)
+}
+
 /** "React, TypeScript\nVite" → ["React", "TypeScript", "Vite"] */
 export function readList(form: FormData, name: string) {
   return readText(form, name)

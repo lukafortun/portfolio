@@ -9,6 +9,7 @@ namespace Portfolio.Api.Tests.Unit;
 public class ProjectServiceTests
 {
     private readonly IProjectRepository _repository = Substitute.For<IProjectRepository>();
+    private readonly ITagService _tags = Substitute.For<ITagService>();
     private readonly ProjectService _service;
 
     private static readonly ProjectRequest Request = new(
@@ -17,7 +18,7 @@ public class ProjectServiceTests
         "https://github.com/x/y",
         null);
 
-    public ProjectServiceTests() => _service = new ProjectService(_repository);
+    public ProjectServiceTests() => _service = new ProjectService(_repository, _tags);
 
     private static Project ExistingProject() => new()
     {
@@ -108,6 +109,23 @@ public class ProjectServiceTests
         Assert.Same(frRow, existing.Translations.Single(t => t.Language == "fr"));
         Assert.Equal("# Contenu", frRow.Content);
         await _repository.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task UpdateAsync_syncs_tags_then_deletes_unused_ones_after_saving()
+    {
+        var existing = ExistingProject();
+        _repository.GetByIdAsync(1, Arg.Any<CancellationToken>()).Returns(existing);
+
+        await _service.UpdateAsync(1, Request with { Tags = ["react"] });
+
+        // Unused tags can only be found once the unlinking is saved.
+        Received.InOrder(() =>
+        {
+            _tags.SyncAsync(existing.Tags, Arg.Is<IEnumerable<string>>(t => t.SequenceEqual(new[] { "react" })), Arg.Any<CancellationToken>());
+            _repository.SaveChangesAsync(Arg.Any<CancellationToken>());
+            _tags.RemoveUnusedAsync(Arg.Any<CancellationToken>());
+        });
     }
 
     [Fact]
