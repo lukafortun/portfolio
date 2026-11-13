@@ -145,6 +145,9 @@ As environment variables, replace `:` with `__` (e.g. `Authentik__ClientSecret`)
 | `GET` | `/api/health` | public |
 | `GET` | `/api/projects`, `/api/projects/{id}`, `/api/projects/by-slug/{slug}` | public |
 | `POST` `PUT` `DELETE` | `/api/projects`, `/api/projects/{id}` | admin |
+| `GET` | `/api/profile`, `/api/skills`, `/api/experiences` | public |
+| `PUT` | `/api/profile` | admin |
+| `POST` `PUT` `DELETE` | `/api/skills`, `/api/skills/{id}`, `/api/experiences`, `/api/experiences/{id}` | admin |
 | `POST` | `/api/uploads` (PNG, JPEG, GIF or WebP, 5 MB max) | admin |
 | `GET` | `/api/uploads/{file}` | public |
 | `GET` | `/api/auth/login` | public (redirects to Authentik) |
@@ -152,6 +155,8 @@ As environment variables, replace `:` with `__` (e.g. `Authentik__ClientSecret`)
 | `GET` | `/api/auth/me` | admin |
 
 "Admin" means signed in and a member of the `portfolio-admins` group.
+
+All the content (profile, skills, experience and projects) is stored in the database and edited from the admin area (`/admin`). On first start, an empty database is filled with example content to replace.
 
 Each project has a unique slug (its page is `/projects/{slug}`), a short summary for the cards and a Markdown content for its page. Texts are translatable: a `fr` translation is required, `en` is optional. `?lang=en` returns them in English, falling back to French when a project has no English translation. In local development, the OpenAPI document is available at `/openapi/v1.json`.
 

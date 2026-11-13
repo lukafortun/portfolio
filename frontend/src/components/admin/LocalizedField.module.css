@@ -1,0 +1,13 @@
+.rows { display: grid; gap: 6px; }
+
+.row {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  align-items: start;
+  gap: 8px;
+}
+
+.flag { display: grid; place-items: center; height: 38px; }
+
+/* Field's ".field textarea" sets a large min-height; translated texts are usually short. */
+.row textarea.textarea { min-height: 0; }

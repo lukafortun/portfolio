@@ -5,26 +5,26 @@ import { EmptyState } from '../components/ui/EmptyState'
 import { Loader } from '../components/ui/Loader'
 import { PageHeader } from '../components/ui/PageHeader'
 import { useProjects } from '../hooks/useProjects'
-import styles from './HomePage.module.css'
+import styles from './ProjectsPage.module.css'
 
-export function HomePage() {
+export function ProjectsPage() {
   const { t } = useTranslation()
   const { projects, error } = useProjects()
 
   return (
     <>
-      <PageHeader command={t('home.command')} title={t('home.title')} subtitle={t('home.subtitle')} />
+      <PageHeader command={t('projects.command')} title={t('projects.title')} subtitle={t('projects.subtitle')} />
 
       {error ? (
-        <Alert>{t('home.loadError', { error })}</Alert>
+        <Alert>{t('projects.loadError', { error })}</Alert>
       ) : !projects ? (
         <Loader />
       ) : projects.length === 0 ? (
-        <EmptyState>{t('home.empty')}</EmptyState>
+        <EmptyState>{t('projects.empty')}</EmptyState>
       ) : (
         <>
           <p className={styles.summary}>
-            {t('home.total')} <strong>{projects.length}</strong>
+            {t('projects.total')} <strong>{projects.length}</strong>
           </p>
           <ProjectGrid projects={projects} />
         </>

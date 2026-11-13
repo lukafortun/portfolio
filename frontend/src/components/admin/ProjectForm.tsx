@@ -1,12 +1,11 @@
-import { useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { Project, ProjectInput } from '../../api/projects'
 import { defaultLanguage, languages } from '../../i18n'
+import { readText } from '../../lib/formData'
 import { slugify } from '../../lib/slugify'
-import { Alert } from '../ui/Alert'
-import { Button } from '../ui/Button'
 import { Field } from '../ui/Field'
 import { Flag } from '../ui/flags'
+import { AdminForm, FormSection, RequiredBadge } from './AdminForm'
 import { CoverImageField } from './CoverImageField'
 import { MarkdownEditor } from './MarkdownEditor'
 import styles from './ProjectForm.module.css'
@@ -23,66 +22,51 @@ const slugPattern = '[a-z0-9]+(-[a-z0-9]+)*'
 
 // Inputs are named "title.fr", "content.en"…
 function readInput(form: FormData): ProjectInput {
-  const text = (name: string) => String(form.get(name) ?? '').trim()
-
   const translations = languages
     .map((language) => ({
       language,
-      title: text(`title.${language}`),
-      summary: text(`summary.${language}`),
-      content: text(`content.${language}`),
+      title: readText(form, `title.${language}`),
+      summary: readText(form, `summary.${language}`),
+      content: readText(form, `content.${language}`),
     }))
     // Optional languages left empty are not sent.
     .filter((t) => t.title || t.summary || t.content)
 
   return {
-    slug: text('slug') || slugify(text(`title.${defaultLanguage}`)),
+    slug: readText(form, 'slug') || slugify(readText(form, `title.${defaultLanguage}`)),
     translations,
-    repoUrl: text('repoUrl') || null,
-    liveUrl: text('liveUrl') || null,
-    coverImage: text('coverImage') || null,
+    repoUrl: readText(form, 'repoUrl') || null,
+    liveUrl: readText(form, 'liveUrl') || null,
+    coverImage: readText(form, 'coverImage') || null,
   }
 }
 
-/**
- * Uncontrolled form: inputs keep their own value and are read on submit.
- * The parent gives it a `key` per project, so switching project remounts it with fresh defaultValues.
- */
+/** Project form: a section per language (title, summary, Markdown content), then cover, slug and links. */
 export function ProjectForm({ project, onSubmit, onCancel }: Props) {
   const { t } = useTranslation()
-  const [submitting, setSubmitting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    const form = event.currentTarget
-    setSubmitting(true)
-    setError(null)
-    try {
-      // On success the parent remounts this form (new key), which clears it.
-      await onSubmit(readInput(new FormData(form)))
-    } catch (e) {
-      setError((e as Error).message)
-    } finally {
-      setSubmitting(false)
-    }
-  }
 
   return (
-    <form onSubmit={handleSubmit} className={styles.form}>
+    <AdminForm
+      onSubmit={(form) => onSubmit(readInput(form))}
+      onCancel={project ? onCancel : undefined}
+      submitLabel={project ? t('form.save') : t('form.create')}
+    >
       {languages.map((language) => {
         const translation = project?.translations.find((tr) => tr.language === language)
         const required = language === defaultLanguage
 
         return (
-          <fieldset key={language} className={styles.section} lang={language}>
-            <legend className={styles.legend}>
-              <Flag language={language} />
-              {t(`language.${language}`)}
-              <span className={required ? styles.required : styles.optional}>
-                {required ? t('form.required') : t('form.optional')}
-              </span>
-            </legend>
+          <FormSection
+            key={language}
+            lang={language}
+            legend={
+              <>
+                <Flag language={language} />
+                {t(`language.${language}`)}
+                <RequiredBadge required={required} />
+              </>
+            }
+          >
             <Field label={t('form.title')}>
               <input name={`title.${language}`} defaultValue={translation?.title} required={required} maxLength={200} />
             </Field>
@@ -104,23 +88,16 @@ export function ProjectForm({ project, onSubmit, onCancel }: Props) {
                 maxLength={100_000}
               />
             </Field>
-          </fieldset>
+          </FormSection>
         )
       })}
 
-      <fieldset className={styles.section}>
-        <legend className={styles.legend}>{t('form.meta')}</legend>
+      <FormSection legend={t('form.meta')}>
         <Field as="div" label={t('form.cover')} hint={t('form.coverHint')}>
           <CoverImageField name="coverImage" defaultValue={project?.coverImage} />
         </Field>
         <Field label={t('form.slug')} hint={t('form.slugHint')}>
-          <input
-            name="slug"
-            defaultValue={project?.slug}
-            pattern={slugPattern}
-            maxLength={100}
-            placeholder="mon-projet"
-          />
+          <input name="slug" defaultValue={project?.slug} pattern={slugPattern} maxLength={100} placeholder="mon-projet" />
         </Field>
         <Field label={t('form.repo')} hint={t('form.repoHint')}>
           <input name="repoUrl" type="url" placeholder="https://github.com/…" defaultValue={project?.repoUrl ?? ''} />
@@ -128,16 +105,7 @@ export function ProjectForm({ project, onSubmit, onCancel }: Props) {
         <Field label={t('form.demo')} hint={t('form.demoHint')}>
           <input name="liveUrl" type="url" placeholder="https://…" defaultValue={project?.liveUrl ?? ''} />
         </Field>
-      </fieldset>
-
-      {error && <Alert>{error}</Alert>}
-
-      <div className={styles.actions}>
-        {project && <Button variant="ghost" onClick={onCancel}>{t('form.cancel')}</Button>}
-        <Button type="submit" variant="primary" disabled={submitting}>
-          {submitting ? t('form.submitting') : project ? t('form.save') : t('form.create')} ⏎
-        </Button>
-      </div>
-    </form>
+      </FormSection>
+    </AdminForm>
   )
 }

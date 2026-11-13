@@ -1,0 +1,17 @@
+.section + .section { margin-top: 64px; }
+
+.categories {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.all {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  text-decoration: none;
+}
+.all:hover { text-decoration: underline; }

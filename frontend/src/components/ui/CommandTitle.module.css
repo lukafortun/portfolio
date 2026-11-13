@@ -1,0 +1,16 @@
+.title {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 20px;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.prompt { color: var(--accent); }
+
+.aside {
+  margin-left: auto;
+  font-size: 0.85rem;
+  font-weight: 500;
+}

@@ -27,7 +27,18 @@
 }
 .prompt { color: var(--accent); }
 
-.nav { display: flex; align-items: center; gap: 2px; }
+.brand { flex-shrink: 0; }
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+  /* On narrow screens the links scroll sideways instead of overflowing the page. */
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.nav > * { flex-shrink: 0; }
 
 .link {
   padding: 4px 10px;
@@ -50,6 +61,7 @@
 .logout::before { content: ''; }
 .logout:hover { color: var(--danger); background: var(--danger-dim); }
 
-@media (max-width: 480px) {
+@media (max-width: 760px) {
   .link::before { content: none; }
+  .link { padding: 4px 8px; }
 }

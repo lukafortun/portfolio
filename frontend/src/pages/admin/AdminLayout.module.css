@@ -1,0 +1,27 @@
+/* tmux-like status line: "0:projects* 1:profile 2:skills" */
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin: -16px 0 32px;
+  padding: 4px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface-2);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+}
+
+.tab {
+  padding: 4px 12px;
+  color: var(--muted);
+  text-decoration: none;
+  transition: background-color 0.12s, color 0.12s;
+}
+.tab:hover { color: var(--text); background: var(--surface); }
+
+.index { opacity: 0.6; }
+
+.active,
+.active:hover { color: var(--on-accent); background: var(--accent); }
+/* tmux marks the current window with "*" */
+.active::after { content: '*'; }

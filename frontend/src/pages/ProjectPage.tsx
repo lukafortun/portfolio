@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next'
 import { Link, useParams } from 'react-router'
-import { ApiError } from '../api/client'
 import { Markdown } from '../components/projects/Markdown'
 import { Alert } from '../components/ui/Alert'
 import { Loader } from '../components/ui/Loader'
@@ -15,15 +14,15 @@ export function ProjectPage() {
   const { t } = useTranslation()
   const language = useLanguage()
   const { slug = '' } = useParams()
-  const { project, error } = useProject(slug)
+  const { project, notFound, error } = useProject(slug)
 
-  if (error instanceof ApiError && error.status === 404) return <NotFoundPage />
-  if (error) return <Alert>{error.message}</Alert>
+  if (notFound) return <NotFoundPage />
+  if (error) return <Alert>{error}</Alert>
   if (!project) return <Loader />
 
   return (
     <article lang={project.language}>
-      <Link to="/" className={styles.back}>{t('project.back')}</Link>
+      <Link to="/projects" className={styles.back}>{t('project.back')}</Link>
 
       <PageHeader command={`cat ~/projects/${project.slug}.md`} title={project.title} subtitle={project.summary} />
 

@@ -26,8 +26,11 @@ export function Header() {
           <Cursor />
         </Link>
 
-        <nav className={styles.nav}>
-          <NavLink to="/" end className={navLinkClass}>{t('nav.projects')}</NavLink>
+        <nav className={styles.nav} aria-label={t('nav.label')}>
+          {/* Not "end": /projects/:slug also highlights "projects". */}
+          <NavLink to="/projects" className={navLinkClass}>{t('nav.projects')}</NavLink>
+          <NavLink to="/skills" className={navLinkClass}>{t('nav.skills')}</NavLink>
+          <NavLink to="/experience" className={navLinkClass}>{t('nav.experience')}</NavLink>
           {email ? (
             <>
               <NavLink to="/admin" className={navLinkClass}>{t('nav.admin')}</NavLink>

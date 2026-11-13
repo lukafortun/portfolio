@@ -1,9 +1,11 @@
 using Microsoft.EntityFrameworkCore;
-using Portfolio.Api.Services;
 
 namespace Portfolio.Api.Data;
 
-/// <summary>Runs on startup: applies pending migrations when Database:MigrateOnStartup is true.</summary>
+/// <summary>
+/// Runs on startup: applies pending migrations when Database:MigrateOnStartup is true,
+/// then fills an empty database with example content (see <see cref="ContentSeeder"/>).
+/// </summary>
 public static class DatabaseInitializer
 {
     public static async Task InitializeAsync(IServiceProvider services)
@@ -11,12 +13,11 @@ public static class DatabaseInitializer
         await using var scope = services.CreateAsyncScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-        var logger = scope.ServiceProvider.GetRequiredService<ILoggerFactory>().CreateLogger(nameof(DatabaseInitializer));
 
         if (db.Database.IsNpgsql())
         {
-            if (config.GetValue<bool>("Database:MigrateOnStartup"))
-                await db.Database.MigrateAsync();
+            if (!config.GetValue<bool>("Database:MigrateOnStartup")) return;
+            await db.Database.MigrateAsync();
         }
         else
         {
@@ -24,5 +25,6 @@ public static class DatabaseInitializer
             await db.Database.EnsureCreatedAsync();
         }
 
+        await ContentSeeder.SeedAsync(db);
     }
 }

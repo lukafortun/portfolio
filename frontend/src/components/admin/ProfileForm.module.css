@@ -1,0 +1,22 @@
+.links { display: grid; gap: 8px; }
+
+.link {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Same look as the inputs inside <Field>. */
+.link input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: 0;
+  background: var(--bg);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+}
+.link input:focus { outline: none; border-color: var(--accent); }
+
+.add { justify-self: start; }

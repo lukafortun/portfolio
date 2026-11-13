@@ -1,0 +1,73 @@
+/* A vertical line with one node per entry, like `git log --graph`. */
+.timeline {
+  position: relative;
+  max-width: 760px;
+  margin: 0;
+  padding: 0 0 0 36px;
+  list-style: none;
+}
+.timeline::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  left: 7px;
+  width: 1px;
+  background: var(--border-strong);
+}
+
+.entry { position: relative; padding-bottom: 48px; }
+.entry:last-child { padding-bottom: 0; }
+
+/* The node: a square on the line. */
+.entry::before {
+  content: '';
+  position: absolute;
+  top: 6px;
+  left: -34px;
+  width: 11px;
+  height: 11px;
+  border: 1px solid var(--accent);
+  background: var(--bg);
+}
+/* Ongoing: filled and glowing. */
+.current::before { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+
+.dates {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.present { color: var(--accent); font-weight: 600; }
+
+.role { margin-top: 6px; font-size: 1.3rem; }
+
+.company {
+  margin-top: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  color: var(--warn);
+}
+.location { color: var(--muted); }
+
+.description {
+  max-width: 65ch;
+  margin-top: 12px;
+  color: var(--muted);
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.tags li {
+  padding: 1px 8px;
+  border: 1px solid var(--border-strong);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--muted);
+}

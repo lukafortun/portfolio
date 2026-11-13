@@ -1,0 +1,16 @@
+/* Keep the form visible while scrolling a long list. */
+.formCard { position: sticky; top: calc(var(--header-height) + 24px); }
+
+@media (max-width: 860px) {
+  .formCard { position: static; }
+}
+
+.listSection { display: grid; gap: 12px; align-content: start; }
+.listSection > h2 { margin-bottom: 0; }
+
+.count {
+  padding: 0 6px;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-size: 0.75rem;
+}

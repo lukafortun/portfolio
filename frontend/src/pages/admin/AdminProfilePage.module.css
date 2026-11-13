@@ -1,0 +1,7 @@
+.card { max-width: 760px; }
+
+.hint {
+  margin-bottom: 24px;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
