@@ -1,0 +1,79 @@
+# Local development entirely in Docker, with hot reload: no .NET SDK or Node.js needed on the machine.
+#
+#   docker compose -f docker-compose.dev.yml up        → http://localhost:5173
+#
+# The sources are mounted in the containers: saving a file reloads the page (Vite) or restarts the API (dotnet watch).
+# Separate from docker-compose.yml (the production stack): its own project name, database and volumes.
+name: portfolio-dev
+
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: portfolio
+      POSTGRES_USER: portfolio
+      POSTGRES_PASSWORD: portfolio_dev
+    ports:
+      # 5433 on the host, so it doesn't clash with the production stack's database (5432).
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U portfolio -d portfolio"]
+      interval: 5s
+      retries: 10
+
+  api:
+    image: mcr.microsoft.com/dotnet/sdk:10.0
+    working_dir: /src
+    # Rebuilds and restarts the API when a .cs file changes.
+    command: dotnet watch run --project src/Portfolio.Api --no-launch-profile --non-interactive
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://0.0.0.0:5071
+      ConnectionStrings__Default: Host=db;Port=5432;Database=portfolio;Username=portfolio;Password=portfolio_dev
+      # Same reason as WATCH_POLLING for Vite below.
+      DOTNET_USE_POLLING_FILE_WATCHER: "true"
+    volumes:
+      - ./backend:/src
+      # The container's build output stays in volumes: sharing bin/ and obj/ with the host
+      # would mix Windows and Linux builds and break "dotnet build" on the host.
+      - api-bin:/src/src/Portfolio.Api/bin
+      - api-obj:/src/src/Portfolio.Api/obj
+      - nuget:/root/.nuget/packages
+      # The Authentik settings saved with "dotnet user-secrets" on the host (read-only).
+      # Windows: %APPDATA%\Microsoft\UserSecrets. Linux/macOS: set USER_SECRETS_DIR=~/.microsoft/usersecrets.
+      - ${USER_SECRETS_DIR:-${APPDATA}/Microsoft/UserSecrets}:/root/.microsoft/usersecrets:ro
+      # Keeps the auth cookie keys, so a restart doesn't sign you out.
+      - dataprotection:/root/.aspnet/DataProtection-Keys
+    ports:
+      # Not needed by the browser (Vite proxies /api), but handy for /openapi/v1.json or curl.
+      - "127.0.0.1:5071:5071"
+
+  web:
+    image: node:24-alpine
+    working_dir: /app
+    # npm install is quick when node_modules is up to date, and picks up package.json changes on restart.
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    depends_on:
+      - api
+    environment:
+      API_URL: http://api:5071
+      WATCH_POLLING: "true"
+    volumes:
+      - ./frontend:/app
+      # Linux node_modules, separate from the host's (native packages differ between Windows and Linux).
+      - node-modules:/app/node_modules
+    ports:
+      - "127.0.0.1:5173:5173"
+
+volumes:
+  pgdata:
+  api-bin:
+  api-obj:
+  nuget:
+  dataprotection:
+  node-modules:
