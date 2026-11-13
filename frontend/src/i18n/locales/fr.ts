@@ -12,6 +12,8 @@ export const fr = {
     admin: 'admin',
     login: 'login',
     logout: 'logout',
+    openMenu: 'Ouvrir le menu',
+    closeMenu: 'Fermer le menu',
   },
   language: {
     label: 'Langue',

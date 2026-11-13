@@ -13,6 +13,8 @@ export const en: Translations = {
     admin: 'admin',
     login: 'login',
     logout: 'logout',
+    openMenu: 'Open menu',
+    closeMenu: 'Close menu',
   },
   language: {
     label: 'Language',

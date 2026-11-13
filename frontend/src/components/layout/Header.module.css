@@ -34,11 +34,14 @@
   align-items: center;
   gap: 2px;
   min-width: 0;
-  /* On narrow screens the links scroll sideways instead of overflowing the page. */
-  overflow-x: auto;
-  scrollbar-width: none;
 }
 .nav > * { flex-shrink: 0; }
+
+/* Language + theme pickers, grouped so they stay side by side in the mobile menu. */
+.prefs {
+  display: flex;
+  align-items: center;
+}
 
 .link {
   padding: 4px 10px;
@@ -61,7 +64,79 @@
 .logout::before { content: ''; }
 .logout:hover { color: var(--danger); background: var(--danger-dim); }
 
+/* Menu button: hidden on wide screens, where the links fit in the header. */
+.menuButton {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  margin-right: -8px;
+  border: 0;
+  background: none;
+  color: var(--text);
+  cursor: pointer;
+}
+.menuButton:focus-visible { outline: 1px solid var(--accent); outline-offset: -4px; }
+
+/* Three bars that turn into an X when the menu is open. */
+.burger {
+  position: relative;
+  display: block;
+  width: 20px;
+  height: 14px;
+}
+.burger > span {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: currentColor;
+  transition: transform 0.18s, opacity 0.18s, top 0.18s;
+}
+.burger > span:nth-child(1) { top: 0; }
+.burger > span:nth-child(2) { top: 6px; }
+.burger > span:nth-child(3) { top: 12px; }
+.burgerOpen > span:nth-child(1) { top: 6px; transform: rotate(45deg); }
+.burgerOpen > span:nth-child(2) { opacity: 0; }
+.burgerOpen > span:nth-child(3) { top: 6px; transform: rotate(-45deg); }
+
 @media (max-width: 760px) {
-  .link::before { content: none; }
-  .link { padding: 4px 8px; }
+  .menuButton { display: inline-flex; }
+
+  /* The nav becomes a panel that drops down under the header. */
+  .nav {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 8px 0 16px;
+    border-bottom: 1px solid var(--border-strong);
+    background: var(--bg);
+    box-shadow: 0 12px 24px rgb(0 0 0 / 0.35);
+  }
+  .navOpen { display: flex; }
+
+  /* Full-width rows, large enough to tap comfortably. */
+  .link {
+    padding: 12px 20px;
+    font-size: 1rem;
+    text-align: left;
+  }
+
+  .prefs {
+    gap: 10px;
+    margin-top: 8px;
+    padding: 12px 20px 0;
+    border-top: 1px solid var(--border);
+  }
+  .nav .prefs > * { margin-left: 0; }
+}
+
+@media (max-width: 760px) and (prefers-reduced-motion: reduce) {
+  .burger > span { transition: none; }
 }
