@@ -5,6 +5,7 @@ import { Alert } from '../../components/ui/Alert'
 import { Card } from '../../components/ui/Card'
 import { Loader } from '../../components/ui/Loader'
 import { useProfile } from '../../hooks/useContent'
+import { setSiteTitle } from '../../lib/siteTitle'
 import styles from './AdminProfilePage.module.css'
 
 /** A single form: there is only one profile. */
@@ -22,6 +23,7 @@ export function AdminProfilePage() {
         profile={profile}
         onSubmit={async (input) => {
           await profileApi.save(input)
+          setSiteTitle(input.name)
           await reload()
         }}
       />

@@ -1,6 +1,8 @@
-import { Suspense } from 'react'
+import { Suspense, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Outlet } from 'react-router'
+import { useProfile } from '../../hooks/useContent'
+import { setSiteTitle } from '../../lib/siteTitle'
 import { Loader } from '../ui/Loader'
 import { Header } from './Header'
 import styles from './Layout.module.css'
@@ -10,6 +12,12 @@ const year = new Date().getFullYear()
 /** Shell shared by every page; the current route renders in <Outlet />. */
 export function Layout() {
   const { t } = useTranslation()
+  const { data: profile } = useProfile()
+
+  // The browser tab shows the name configured in the admin profile.
+  useEffect(() => {
+    if (profile) setSiteTitle(profile.name)
+  }, [profile])
 
   return (
     <div className={styles.shell}>
