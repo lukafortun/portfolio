@@ -1,0 +1,33 @@
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  gap: 32px;
+  align-items: start;
+}
+
+/* Keep the form visible while scrolling a long list. */
+.formCard { position: sticky; top: calc(var(--header-height) + 24px); }
+
+@media (max-width: 860px) {
+  .layout { grid-template-columns: minmax(0, 1fr); }
+  .formCard { position: static; }
+}
+
+.listSection { display: grid; gap: 12px; }
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+.prompt { color: var(--accent); }
+
+.count {
+  margin-left: auto;
+  padding: 0 6px;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-size: 0.75rem;
+}

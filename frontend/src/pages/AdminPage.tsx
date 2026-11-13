@@ -1,79 +1,72 @@
-import { useEffect, useState, type FormEvent } from 'react'
-import { api, type Project, type ProjectInput } from '../api'
-
-const empty: ProjectInput = { title: '', description: '', repoUrl: null, liveUrl: null }
+import { useState } from 'react'
+import { projectsApi, type Project, type ProjectInput } from '../api/projects'
+import { AdminProjectList } from '../components/admin/AdminProjectList'
+import { ProjectForm } from '../components/admin/ProjectForm'
+import { Alert } from '../components/ui/Alert'
+import { Card } from '../components/ui/Card'
+import { EmptyState } from '../components/ui/EmptyState'
+import { Loader } from '../components/ui/Loader'
+import { PageHeader } from '../components/ui/PageHeader'
+import { useProjects } from '../hooks/useProjects'
+import styles from './AdminPage.module.css'
 
 export function AdminPage() {
-  const [projects, setProjects] = useState<Project[]>([])
+  const { projects, error, reload } = useProjects()
   const [editing, setEditing] = useState<Project | null>(null)
-  const [error, setError] = useState<string | null>(null)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
 
-  const reload = () => api.listProjects().then(setProjects, (e: Error) => setError(e.message))
-  useEffect(() => { reload() }, [])
-
-  const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    const formElement = event.currentTarget
-    const form = new FormData(formElement)
-    const input: ProjectInput = {
-      title: String(form.get('title')),
-      description: String(form.get('description')),
-      repoUrl: String(form.get('repoUrl')) || null,
-      liveUrl: String(form.get('liveUrl')) || null,
-    }
-    try {
-      setError(null)
-      if (editing) await api.updateProject(editing.id, input)
-      else await api.createProject(input)
-      setEditing(null)
-      formElement.reset()
-      await reload()
-    } catch (e) {
-      setError((e as Error).message)
-    }
-  }
-
-  const onDelete = async (p: Project) => {
-    if (!confirm(`Supprimer « ${p.title} » ?`)) return
-    await api.deleteProject(p.id)
+  // Errors are thrown back to ProjectForm, which displays them.
+  const save = async (input: ProjectInput) => {
+    if (editing) await projectsApi.update(editing.id, input)
+    else await projectsApi.create(input)
+    setEditing(null)
     await reload()
   }
 
-  const current = editing ?? empty
+  const remove = async (project: Project) => {
+    if (!confirm(`Supprimer « ${project.title} » ?`)) return
+    try {
+      setDeleteError(null)
+      await projectsApi.remove(project.id)
+      if (editing?.id === project.id) setEditing(null)
+      await reload()
+    } catch (e) {
+      setDeleteError((e as Error).message)
+    }
+  }
 
   return (
-    <section>
-      <h1>Administration</h1>
+    <>
+      <PageHeader
+        command="sudo admin"
+        title="Gérer les projets"
+        subtitle="Ajoute, modifie ou supprime les projets affichés sur le site."
+      />
 
-      {/* Changing the key remounts the form, resetting its defaultValues for the edited project. */}
-      <form key={editing?.id ?? 'new'} onSubmit={onSubmit} className="form">
-        <h2>{editing ? `Modifier « ${editing.title} »` : 'Nouveau projet'}</h2>
-        <label>Titre<input name="title" defaultValue={current.title} required maxLength={200} /></label>
-        <label>Description<textarea name="description" defaultValue={current.description} required rows={4} /></label>
-        <label>URL du code<input name="repoUrl" type="url" defaultValue={current.repoUrl ?? ''} /></label>
-        <label>URL de la démo<input name="liveUrl" type="url" defaultValue={current.liveUrl ?? ''} /></label>
-        {error && <p className="error">{error}</p>}
-        <div className="row">
-          <button type="submit">{editing ? 'Enregistrer' : 'Créer'}</button>
-          {editing && <button type="button" onClick={() => setEditing(null)}>Annuler</button>}
-        </div>
-      </form>
+      <div className={styles.layout}>
+        <Card title={editing ? `edit — ${editing.title}` : 'new-project'} className={styles.formCard}>
+          <ProjectForm key={editing?.id ?? 'new'} project={editing} onSubmit={save} onCancel={() => setEditing(null)} />
+        </Card>
 
-      <table className="table">
-        <thead><tr><th>Titre</th><th>Créé le</th><th /></tr></thead>
-        <tbody>
-          {projects.map((p) => (
-            <tr key={p.id}>
-              <td>{p.title}</td>
-              <td>{new Date(p.createdAt).toLocaleDateString('fr-FR')}</td>
-              <td className="row">
-                <button onClick={() => setEditing(p)}>Modifier</button>
-                <button onClick={() => onDelete(p)}>Supprimer</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </section>
+        <section className={styles.listSection}>
+          <h2 className={styles.sectionTitle}>
+            <span className={styles.prompt}>$</span> ls -l projets
+            <span className={styles.count}>{projects?.length ?? 0}</span>
+          </h2>
+
+          {deleteError && <Alert>{deleteError}</Alert>}
+
+          {error ? (
+            <Alert>{error}</Alert>
+          ) : !projects ? (
+            <Loader />
+          ) : projects.length === 0 ? (
+            <EmptyState>aucun projet, crée le premier avec le formulaire</EmptyState>
+          ) : (
+            <AdminProjectList projects={projects} selectedId={editing?.id} onEdit={setEditing} onDelete={remove} />
+          )}
+        </section>
+      </div>
+    </>
   )
 }

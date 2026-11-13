@@ -1,0 +1,35 @@
+.field { display: grid; gap: 6px; }
+
+/* Labels look like CLI flags: --titre */
+.label {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--muted);
+}
+.label::before { content: '--'; color: var(--accent); }
+
+.hint { font-size: 0.78rem; color: var(--muted); }
+
+.field input,
+.field textarea {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: 0;
+  background: var(--bg);
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  caret-color: var(--accent);
+  transition: border-color 0.12s, box-shadow 0.12s;
+}
+.field textarea { resize: vertical; min-height: 120px; line-height: 1.5; }
+.field input::placeholder,
+.field textarea::placeholder { color: var(--muted); opacity: 0.6; }
+
+.field input:focus,
+.field textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 3px 3px 0 var(--accent-dim);
+}

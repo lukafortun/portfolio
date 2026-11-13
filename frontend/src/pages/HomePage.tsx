@@ -1,33 +1,36 @@
-import { useEffect, useState } from 'react'
-import { api, type Project } from '../api'
+import { ProjectGrid } from '../components/projects/ProjectGrid'
+import { Alert } from '../components/ui/Alert'
+import { EmptyState } from '../components/ui/EmptyState'
+import { Loader } from '../components/ui/Loader'
+import { PageHeader } from '../components/ui/PageHeader'
+import { useProjects } from '../hooks/useProjects'
+import styles from './HomePage.module.css'
 
 export function HomePage() {
-  const [projects, setProjects] = useState<Project[] | null>(null)
-  const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    api.listProjects().then(setProjects, (e: Error) => setError(e.message))
-  }, [])
-
-  if (error) return <p className="error">Impossible de charger les projets : {error}</p>
-  if (!projects) return <p>Chargement…</p>
+  const { projects, error } = useProjects()
 
   return (
-    <section>
-      <h1>Projets</h1>
-      {projects.length === 0 && <p>Aucun projet pour l’instant.</p>}
-      <ul className="cards">
-        {projects.map((p) => (
-          <li key={p.id} className="card">
-            <h2>{p.title}</h2>
-            <p>{p.description}</p>
-            <div className="links">
-              {p.repoUrl && <a href={p.repoUrl} target="_blank" rel="noreferrer">Code</a>}
-              {p.liveUrl && <a href={p.liveUrl} target="_blank" rel="noreferrer">Démo</a>}
-            </div>
-          </li>
-        ))}
-      </ul>
-    </section>
+    <>
+      <PageHeader
+        command="ls ~/projets"
+        title="Mes projets"
+        subtitle="Une sélection de ce que j’ai pu construire."
+      />
+
+      {error ? (
+        <Alert>Impossible de charger les projets : {error}</Alert>
+      ) : !projects ? (
+        <Loader />
+      ) : projects.length === 0 ? (
+        <EmptyState>aucun projet pour l’instant</EmptyState>
+      ) : (
+        <>
+          <p className={styles.summary}>
+            total <strong>{projects.length}</strong>
+          </p>
+          <ProjectGrid projects={projects} />
+        </>
+      )}
+    </>
   )
 }

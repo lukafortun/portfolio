@@ -1,0 +1,8 @@
+.empty {
+  padding: 40px 24px;
+  border: 1px dashed var(--border-strong);
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+.empty::before { content: '// '; color: var(--accent); }

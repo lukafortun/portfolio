@@ -1,0 +1,11 @@
+.error {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  color: var(--danger);
+  word-break: break-all;
+}
+
+.back {
+  font-family: var(--font-mono);
+  font-weight: 600;
+}

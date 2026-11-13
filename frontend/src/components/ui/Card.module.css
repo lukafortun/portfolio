@@ -1,0 +1,24 @@
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-strong);
+  background: var(--surface-2);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.dots { display: flex; gap: 6px; }
+.dots i { width: 9px; height: 9px; border: 1px solid var(--border-strong); }
+.dots i:first-child { background: var(--danger); border-color: var(--danger); }
+
+.title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.body { padding: 24px; }

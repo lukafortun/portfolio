@@ -1,0 +1,77 @@
+:root {
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Code', Consolas, monospace;
+  --font-sans: 'IBM Plex Sans', system-ui, 'Segoe UI', sans-serif;
+
+  --bg: #0a0b0a;
+  --surface: #0f1110;
+  --surface-2: #151917;
+  --border: #232b26;
+  --border-strong: #3b4a40;
+  --text: #d9e2dc;
+  --muted: #7f8c84;
+  --accent: #3ddc84;
+  --accent-dim: rgb(61 220 132 / 0.1);
+  --on-accent: #03130a;
+  --warn: #ffb547;
+  --danger: #ff5f56;
+  --danger-dim: rgb(255 95 86 / 0.1);
+  --grid-line: rgb(255 255 255 / 0.025);
+
+  --content-width: 1080px;
+  --header-height: 57px;
+
+  font: 16px/1.65 var(--font-sans);
+  color-scheme: dark;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg: #f3f1ea;
+    --surface: #fbfaf6;
+    --surface-2: #eceadf;
+    --border: #d6d1c2;
+    --border-strong: #a8a391;
+    --text: #15170f;
+    --muted: #66685a;
+    --accent: #0b7a3e;
+    --accent-dim: rgb(11 122 62 / 0.09);
+    --on-accent: #ffffff;
+    --warn: #a15c00;
+    --danger: #c2261c;
+    --danger-dim: rgb(194 38 28 / 0.08);
+    --grid-line: rgb(0 0 0 / 0.035);
+    color-scheme: light;
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+h1, h2, h3 {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+p { margin: 0; }
+a { color: var(--accent); text-underline-offset: 3px; }
+button, input, textarea { font: inherit; color: inherit; }
+::selection { background: var(--accent); color: var(--on-accent); }
+
+:focus-visible { outline: 1px solid var(--accent); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}

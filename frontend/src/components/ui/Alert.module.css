@@ -1,0 +1,20 @@
+.alert {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 10px 14px;
+  border: 1px solid var(--danger);
+  border-left-width: 3px;
+  background: var(--danger-dim);
+  color: var(--danger);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+}
+
+.tag {
+  padding: 0 5px;
+  background: var(--danger);
+  color: var(--bg);
+  font-weight: 700;
+  text-transform: uppercase;
+}
