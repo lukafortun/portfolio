@@ -1,0 +1,45 @@
+.switcher {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-left: 10px;
+  border: 1px solid var(--border-strong);
+  transition: background-color 0.12s;
+}
+.switcher:hover { background: var(--surface-2); }
+.switcher:focus-within { outline: 1px solid var(--accent); outline-offset: 2px; }
+
+.swatch {
+  width: 10px;
+  height: 10px;
+  margin-left: 8px;
+  background: var(--accent);
+  pointer-events: none;
+}
+
+/* Native select (keyboard and mobile friendly), restyled: the arrow is drawn by ::after. */
+.select {
+  appearance: none;
+  padding: 3px 24px 3px 8px;
+  border: 0;
+  outline: none;
+  background: none;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+}
+.switcher:hover .select { color: var(--text); }
+
+.select option { background: var(--surface); color: var(--text); }
+
+.switcher::after {
+  content: '▾';
+  position: absolute;
+  right: 8px;
+  font-size: 0.7rem;
+  color: var(--muted);
+  pointer-events: none;
+}

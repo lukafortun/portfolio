@@ -5,6 +5,7 @@ import { cx } from '../../lib/cx'
 import { Cursor } from '../ui/Cursor'
 import styles from './Header.module.css'
 import { LanguageSwitcher } from './LanguageSwitcher'
+import { ThemeSwitcher } from './ThemeSwitcher'
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) => cx(styles.link, isActive && styles.active)
 
@@ -42,6 +43,7 @@ export function Header() {
             <NavLink to="/login" className={navLinkClass}>{t('nav.login')}</NavLink>
           )}
           <LanguageSwitcher />
+          <ThemeSwitcher />
         </nav>
       </div>
     </header>

@@ -19,6 +19,10 @@ export const en: Translations = {
     fr: 'Français',
     en: 'English',
   },
+  theme: {
+    label: 'Color theme',
+    auto: 'auto',
+  },
   home: {
     explore: 'ls ~',
     latest: 'ls -t ~/projects | head -3',

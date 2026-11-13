@@ -18,6 +18,10 @@ export const fr = {
     fr: 'Français',
     en: 'English',
   },
+  theme: {
+    label: 'Thème de couleurs',
+    auto: 'auto',
+  },
   home: {
     explore: 'ls ~',
     latest: 'ls -t ~/projets | head -3',

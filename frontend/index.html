@@ -4,8 +4,19 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#0a0b0a" media="(prefers-color-scheme: dark)" />
-    <meta name="theme-color" content="#f3f1ea" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0a0b0a" />
+    <script>
+      // Apply the saved theme before the first paint, so the page never flashes in the wrong colors.
+      // Same rules as src/theme/theme.ts: no saved theme = auto (paper if the system is light, else phosphor).
+      ;(function () {
+        var theme = null
+        try {
+          theme = localStorage.getItem('theme')
+        } catch (e) {}
+        if (!theme) theme = matchMedia('(prefers-color-scheme: light)').matches ? 'paper' : 'phosphor'
+        document.documentElement.dataset.theme = theme
+      })()
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link

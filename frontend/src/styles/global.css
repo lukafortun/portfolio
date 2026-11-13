@@ -2,6 +2,24 @@
   --font-mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Code', Consolas, monospace;
   --font-sans: 'IBM Plex Sans', system-ui, 'Segoe UI', sans-serif;
 
+  --content-width: 1080px;
+  --header-height: 57px;
+
+  font: 16px/1.65 var(--font-sans);
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+/*
+ * Color palettes. <html data-theme="…"> is set by index.html (before the first paint) and by the
+ * theme switcher in the header; the list of themes is in src/theme/theme.ts.
+ * Components only use these variables, so a new theme is just a new block here.
+ */
+
+/* Default: green phosphor terminal. */
+:root,
+[data-theme='phosphor'] {
   --bg: #0a0b0a;
   --surface: #0f1110;
   --surface-2: #151917;
@@ -16,35 +34,83 @@
   --danger: #ff5f56;
   --danger-dim: rgb(255 95 86 / 0.1);
   --grid-line: rgb(255 255 255 / 0.025);
-
-  --content-width: 1080px;
-  --header-height: 57px;
-
-  font: 16px/1.65 var(--font-sans);
   color-scheme: dark;
-  color: var(--text);
-  background: var(--bg);
-  -webkit-font-smoothing: antialiased;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    --bg: #f3f1ea;
-    --surface: #fbfaf6;
-    --surface-2: #eceadf;
-    --border: #d6d1c2;
-    --border-strong: #a8a391;
-    --text: #15170f;
-    --muted: #66685a;
-    --accent: #0b7a3e;
-    --accent-dim: rgb(11 122 62 / 0.09);
-    --on-accent: #ffffff;
-    --warn: #a15c00;
-    --danger: #c2261c;
-    --danger-dim: rgb(194 38 28 / 0.08);
-    --grid-line: rgb(0 0 0 / 0.035);
-    color-scheme: light;
-  }
+/* Amber CRT monitor. */
+[data-theme='amber'] {
+  --bg: #0d0a06;
+  --surface: #120e08;
+  --surface-2: #19140b;
+  --border: #2d2414;
+  --border-strong: #4d3d20;
+  --text: #ecdcc0;
+  --muted: #9a8664;
+  --accent: #ffb000;
+  --accent-dim: rgb(255 176 0 / 0.1);
+  --on-accent: #1a1000;
+  --warn: #ff8a3d;
+  --danger: #ff5f56;
+  --danger-dim: rgb(255 95 86 / 0.1);
+  --grid-line: rgb(255 210 140 / 0.03);
+  color-scheme: dark;
+}
+
+/* Cold blue. */
+[data-theme='ice'] {
+  --bg: #080b10;
+  --surface: #0d1118;
+  --surface-2: #131923;
+  --border: #212a38;
+  --border-strong: #364559;
+  --text: #d6e1ee;
+  --muted: #7b8a9e;
+  --accent: #5cc8ff;
+  --accent-dim: rgb(92 200 255 / 0.1);
+  --on-accent: #021420;
+  --warn: #ffb547;
+  --danger: #ff6b6b;
+  --danger-dim: rgb(255 107 107 / 0.1);
+  --grid-line: rgb(200 225 255 / 0.03);
+  color-scheme: dark;
+}
+
+/* Purple night with a magenta accent. */
+[data-theme='synth'] {
+  --bg: #0d0810;
+  --surface: #130c17;
+  --surface-2: #1b1220;
+  --border: #2d1f35;
+  --border-strong: #4b3457;
+  --text: #eadcf0;
+  --muted: #9a85a6;
+  --accent: #ff5cc8;
+  --accent-dim: rgb(255 92 200 / 0.1);
+  --on-accent: #1e0216;
+  --warn: #ffcf5c;
+  --danger: #ff6a3d;
+  --danger-dim: rgb(255 106 61 / 0.1);
+  --grid-line: rgb(255 200 255 / 0.03);
+  color-scheme: dark;
+}
+
+/* Light: printed listing on paper. */
+[data-theme='paper'] {
+  --bg: #f3f1ea;
+  --surface: #fbfaf6;
+  --surface-2: #eceadf;
+  --border: #d6d1c2;
+  --border-strong: #a8a391;
+  --text: #15170f;
+  --muted: #66685a;
+  --accent: #0b7a3e;
+  --accent-dim: rgb(11 122 62 / 0.09);
+  --on-accent: #ffffff;
+  --warn: #a15c00;
+  --danger: #c2261c;
+  --danger-dim: rgb(194 38 28 / 0.08);
+  --grid-line: rgb(0 0 0 / 0.035);
+  color-scheme: light;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
