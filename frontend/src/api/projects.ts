@@ -25,6 +25,8 @@ export type ProjectListItem = {
   createdAt: string
   /** Languages this project is translated into */
   languages: Language[]
+  /** Lowercase, without "#": ["react", "docker"] */
+  tags: string[]
 }
 
 /** A full project, for its page and for the admin form. */
@@ -40,6 +42,16 @@ export type ProjectInput = {
   repoUrl: string | null
   liveUrl: string | null
   coverImage: string | null
+  /** Normalized by the API: "#React" → "react", "Spring Boot" → "spring-boot" */
+  tags: string[]
+}
+
+/** A tag and the number of projects using it. */
+export type TagUsage = { name: string; projectCount: number }
+
+export const tagsApi = {
+  /** Every tag in use, most used first. */
+  list: () => request<TagUsage[]>('/tags'),
 }
 
 export const projectsApi = {

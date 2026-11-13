@@ -12,7 +12,8 @@ public static class ProjectMappings
         var t = p.Translate(language);
         return new ProjectListItemDto(
             p.Id, p.Slug, t.Language, t.Title, t.Summary, p.RepoUrl, p.LiveUrl, p.CoverImage, p.CreatedAt,
-            p.OrderedTranslations().Select(x => x.Language).ToList());
+            p.OrderedTranslations().Select(x => x.Language).ToList(),
+            p.TagNames());
     }
 
     /// <param name="language">Language to show; falls back to the default language.</param>
@@ -23,8 +24,23 @@ public static class ProjectMappings
             p.Id, p.Slug, t.Language, t.Title, t.Summary, t.Content, p.RepoUrl, p.LiveUrl, p.CoverImage, p.CreatedAt,
             p.OrderedTranslations()
                 .Select(x => new ProjectTranslationDto(x.Language, x.Title, x.Summary, x.Content))
-                .ToList());
+                .ToList(),
+            p.TagNames());
     }
+
+    /// <summary>A join table has no order: tags are returned alphabetically.</summary>
+    private static List<string> TagNames(this Project p) => p.Tags.Select(t => t.Name).Order().ToList();
+
+    /// <summary>
+    /// Tags are used in URLs (?tag=react) and compared as-is, so they get one canonical form:
+    /// "#React", " react " and "React" all become "react"; spaces become dashes ("Spring Boot" → "spring-boot").
+    /// </summary>
+    public static List<string> NormalizeTags(IEnumerable<string>? tags) =>
+        (tags ?? [])
+            .Select(t => string.Join('-', t.Trim().TrimStart('#').ToLowerInvariant().Split(' ', StringSplitOptions.RemoveEmptyEntries)))
+            .Where(t => t.Length > 0)
+            .Distinct()
+            .ToList();
 
     /// <summary>Requested language → default language → any translation.</summary>
     private static ProjectTranslation Translate(this Project p, string? language)
@@ -45,6 +61,7 @@ public static class ProjectMappings
         RepoUrl = r.RepoUrl,
         LiveUrl = r.LiveUrl,
         CoverImage = r.CoverImage,
+        // Tags are set by ProjectService: existing Tag rows must be loaded from the database first.
         Translations = r.Translations
             .Select(t => new ProjectTranslation
             {

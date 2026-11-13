@@ -14,6 +14,9 @@ public class Project
     public string? CoverImage { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
+    /// <summary>Technologies / topics ("react", "docker"), through the ProjectTags join table.</summary>
+    public List<Tag> Tags { get; set; } = [];
+
     /// <summary>Title, summary and content, one row per language (table ProjectTranslations).</summary>
     public List<ProjectTranslation> Translations { get; set; } = [];
 }

@@ -23,7 +23,8 @@ public record ProjectListItemDto(
     string? LiveUrl,
     string? CoverImage,
     DateTime CreatedAt,
-    IReadOnlyList<string> Languages);
+    IReadOnlyList<string> Languages,
+    IReadOnlyList<string> Tags);
 
 /// <summary>A full project, for its page and for the admin form.</summary>
 /// <param name="Language">Language of Title, Summary and Content (see <see cref="ProjectListItemDto"/>).</param>
@@ -39,7 +40,11 @@ public record ProjectDto(
     string? LiveUrl,
     string? CoverImage,
     DateTime CreatedAt,
-    IReadOnlyList<ProjectTranslationDto> Translations);
+    IReadOnlyList<ProjectTranslationDto> Translations,
+    IReadOnlyList<string> Tags);
+
+/// <summary>A tag and the number of projects using it (suggestions in the admin form).</summary>
+public record TagDto(string Name, int ProjectCount);
 
 public record ProjectRequest(
     [Required, StringLength(100), RegularExpression(ProjectRequest.SlugPattern, ErrorMessage = ProjectRequest.SlugError)]
@@ -47,7 +52,8 @@ public record ProjectRequest(
     [Required] IReadOnlyList<ProjectTranslationDto> Translations,
     [Url, StringLength(500)] string? RepoUrl,
     [Url, StringLength(500)] string? LiveUrl,
-    [StringLength(500)] string? CoverImage = null) : IValidatableObject
+    [StringLength(500)] string? CoverImage = null,
+    [MaxLength(15)] List<string>? Tags = null) : IValidatableObject
 {
     /// <summary>Lowercase words separated by single dashes: "my-project-2".</summary>
     public const string SlugPattern = "^[a-z0-9]+(-[a-z0-9]+)*$";
@@ -59,6 +65,9 @@ public record ProjectRequest(
         // An uploaded image (/api/uploads/…) or an absolute http(s) URL.
         if (CoverImage is not null && !IsUploadedImage(CoverImage) && !IsHttpUrl(CoverImage))
             yield return new ValidationResult("The cover image must be an uploaded image or an http(s) URL.", [nameof(CoverImage)]);
+
+        foreach (var error in DTOs.Tags.Validate(Tags, nameof(Tags)))
+            yield return error;
 
         if (Translations is null) yield break;
         var languages = Translations.Where(t => t is not null).Select(t => t.Language).ToList();

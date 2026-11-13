@@ -29,6 +29,9 @@
 }
 .link:hover { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
 
+/* Right below the date and links (pulled up into the .meta bottom margin). */
+.tags { margin: -28px 0 40px; }
+
 .cover {
   display: block;
   width: 100%;

@@ -9,6 +9,7 @@ import { AdminForm, FormSection, RequiredBadge } from './AdminForm'
 import { CoverImageField } from './CoverImageField'
 import { MarkdownEditor } from './MarkdownEditor'
 import styles from './ProjectForm.module.css'
+import { TagInput } from './TagInput'
 
 type Props = {
   /** The project being edited, or null to create a new one */
@@ -38,6 +39,8 @@ function readInput(form: FormData): ProjectInput {
     repoUrl: readText(form, 'repoUrl') || null,
     liveUrl: readText(form, 'liveUrl') || null,
     coverImage: readText(form, 'coverImage') || null,
+    // "#react #docker", "react, docker"… the API normalizes them (lowercase, no "#").
+    tags: readText(form, 'tags').split(/[\s,]+/).filter(Boolean),
   }
 }
 
@@ -95,6 +98,10 @@ export function ProjectForm({ project, onSubmit, onCancel }: Props) {
       <FormSection legend={t('form.meta')}>
         <Field as="div" label={t('form.cover')} hint={t('form.coverHint')}>
           <CoverImageField name="coverImage" defaultValue={project?.coverImage} />
+        </Field>
+        {/* as="div": the field holds buttons (remove a tag), a <label> wrapper would also trigger them. */}
+        <Field as="div" label={t('form.tags')} hint={t('form.projectTagsHint')}>
+          <TagInput name="tags" label={t('form.tags')} defaultValue={project?.tags} />
         </Field>
         <Field label={t('form.slug')} hint={t('form.slugHint')}>
           <input name="slug" defaultValue={project?.slug} pattern={slugPattern} maxLength={100} placeholder="mon-projet" />

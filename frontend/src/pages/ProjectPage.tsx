@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { Link, useParams } from 'react-router'
 import { Markdown } from '../components/projects/Markdown'
+import { TagList } from '../components/projects/TagList'
 import { Alert } from '../components/ui/Alert'
 import { Loader } from '../components/ui/Loader'
 import { PageHeader } from '../components/ui/PageHeader'
@@ -39,6 +40,8 @@ export function ProjectPage() {
           </a>
         )}
       </div>
+
+      <TagList tags={project.tags} className={styles.tags} />
 
       {project.coverImage && <img src={project.coverImage} alt="" className={styles.cover} />}
 

@@ -3,14 +3,17 @@ import { Link } from 'react-router'
 import type { ProjectListItem } from '../../api/projects'
 import { formatDate, padIndex } from '../../lib/format'
 import styles from './ProjectCard.module.css'
+import { TagList } from './TagList'
 
 type Props = {
   project: ProjectListItem
   /** Position in the list, shown as 01, 02… */
   index: number
+  /** Tag currently used to filter the list, highlighted */
+  activeTag?: string | null
 }
 
-export function ProjectCard({ project, index }: Props) {
+export function ProjectCard({ project, index, activeTag }: Props) {
   const { t } = useTranslation()
   const { slug, title, summary, repoUrl, liveUrl, coverImage, createdAt } = project
 
@@ -30,6 +33,7 @@ export function ProjectCard({ project, index }: Props) {
         <Link to={`/projects/${slug}`} className={styles.titleLink}>{title}</Link>
       </h2>
       <p className={styles.summary}>{summary}</p>
+      <TagList tags={project.tags} active={activeTag} />
 
       <div className={styles.links}>
         {repoUrl && (

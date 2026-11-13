@@ -1,5 +1,8 @@
 using System.Net;
 using System.Net.Http.Json;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Portfolio.Api.Data;
 using Portfolio.Api.DTOs;
 
 namespace Portfolio.Api.Tests.Integration;
@@ -51,7 +54,10 @@ public class ProjectsTests(ApiFactory factory) : IClassFixture<ApiFactory>
         { "cover path traversal", ValidInput("g") with { CoverImage = "/api/uploads/../appsettings.json" } },
         { "missing default language", ValidInput("c") with { Translations = [new("en", "Title", "summary", null)] } },
         { "unsupported language", ValidInput("d") with { Translations = [new("fr", "T", "S", null), new("de", "T", "S", null)] } },
-        { "duplicate language", ValidInput("e") with { Translations = [new("fr", "T", "S", null), new("fr", "T2", "S2", null)] } },
+        { "empty tag", ValidInput("h") with { Tags = ["react", " "] } },
+        { "tag too long", ValidInput("i") with { Tags = [new string('a', 51)] } },
+        { "too many tags", ValidInput("j") with { Tags = Enumerable.Range(0, 16).Select(i => $"t{i}").ToList() } },
+        { "duplicate language",ValidInput("e") with { Translations = [new("fr", "T", "S", null), new("fr", "T2", "S2", null)] } },
     };
 
     [Theory]
@@ -115,5 +121,67 @@ public class ProjectsTests(ApiFactory factory) : IClassFixture<ApiFactory>
         // Delete (translations are deleted in cascade)
         Assert.Equal(HttpStatusCode.NoContent, (await admin.DeleteAsync($"/api/projects/{project.Id}")).StatusCode);
         Assert.Equal(HttpStatusCode.NotFound, (await anonymous.GetAsync($"/api/projects/{project.Id}")).StatusCode);
+    }
+
+    [Fact]
+    public async Task Tags_are_normalized()
+    {
+        var admin = factory.CreateUserClient();
+        var input = ValidInput("tags") with { Tags = ["#React", " react ", "Spring  Boot", "DOCKER"] };
+
+        var created = await admin.PostAsJsonAsync("/api/projects", input);
+        created.EnsureSuccessStatusCode();
+
+        // Lowercase, no "#", spaces → dashes, duplicates removed, sorted; returned by the list and by the page.
+        string[] expected = ["docker", "react", "spring-boot"];
+        Assert.Equal(expected, (await created.Content.ReadFromJsonAsync<ProjectDto>())!.Tags);
+        var list = await factory.CreateAnonymousClient().GetFromJsonAsync<List<ProjectListItemDto>>("/api/projects");
+        Assert.Equal(expected, list!.Single(p => p.Slug == "tags").Tags);
+    }
+
+    [Fact]
+    public async Task Tags_are_shared_between_projects_and_deleted_when_unused()
+    {
+        var admin = factory.CreateUserClient();
+        var first = await (await admin.PostAsJsonAsync("/api/projects", ValidInput("shared-1") with { Tags = ["shared", "only-one"] }))
+            .Content.ReadFromJsonAsync<ProjectDto>();
+        var second = await (await admin.PostAsJsonAsync("/api/projects", ValidInput("shared-2") with { Tags = ["shared"] }))
+            .Content.ReadFromJsonAsync<ProjectDto>();
+
+        // One "shared" row, linked to both projects.
+        Assert.Equal(1, await CountTagsAsync("shared"));
+
+        // "only-one" loses its last project: deleted. "shared" is still used by the second project.
+        (await admin.PutAsJsonAsync($"/api/projects/{first!.Id}", ValidInput("shared-1"))).EnsureSuccessStatusCode();
+        Assert.Equal(0, await CountTagsAsync("only-one"));
+        Assert.Equal(1, await CountTagsAsync("shared"));
+
+        // Deleting the last project that uses "shared" deletes it too.
+        (await admin.DeleteAsync($"/api/projects/{second!.Id}")).EnsureSuccessStatusCode();
+        Assert.Equal(0, await CountTagsAsync("shared"));
+    }
+
+    [Fact]
+    public async Task Tags_endpoint_lists_tags_with_their_project_count()
+    {
+        var admin = factory.CreateUserClient();
+        (await admin.PostAsJsonAsync("/api/projects", ValidInput("count-1") with { Tags = ["counted", "solo"] })).EnsureSuccessStatusCode();
+        (await admin.PostAsJsonAsync("/api/projects", ValidInput("count-2") with { Tags = ["counted"] })).EnsureSuccessStatusCode();
+
+        // Public, like the project list.
+        var tags = await factory.CreateAnonymousClient().GetFromJsonAsync<List<TagDto>>("/api/tags");
+
+        Assert.Equal(2, tags!.Single(t => t.Name == "counted").ProjectCount);
+        Assert.Equal(1, tags.Single(t => t.Name == "solo").ProjectCount);
+        // Most used first.
+        Assert.True(tags.FindIndex(t => t.Name == "counted") < tags.FindIndex(t => t.Name == "solo"));
+    }
+
+    /// <summary>Reads the Tags table directly: the API never exposes tag rows.</summary>
+    private async Task<int> CountTagsAsync(string name)
+    {
+        using var scope = factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        return await db.Tags.CountAsync(t => t.Name == name);
     }
 }

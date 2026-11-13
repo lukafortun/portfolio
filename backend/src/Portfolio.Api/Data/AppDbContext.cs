@@ -6,6 +6,7 @@ namespace Portfolio.Api.Data;
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
     public DbSet<Project> Projects => Set<Project>();
+    public DbSet<Tag> Tags => Set<Tag>();
     public DbSet<Profile> Profiles => Set<Profile>();
     public DbSet<SkillGroup> SkillGroups => Set<SkillGroup>();
     public DbSet<Experience> Experiences => Set<Experience>();
@@ -19,12 +20,28 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.Property(p => p.RepoUrl).HasMaxLength(500);
             e.Property(p => p.LiveUrl).HasMaxLength(500);
             e.Property(p => p.CoverImage).HasMaxLength(500);
-
             // One project → many translations; deleting a project deletes its translations.
             e.HasMany(p => p.Translations)
                 .WithOne()
                 .HasForeignKey(t => t.ProjectId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // Many projects ↔ many tags, through the join table ProjectTags (ProjectId, TagId).
+            // EF Core manages that table itself: adding a Tag to project.Tags inserts a row in it.
+            // Deleting a project (or a tag) deletes its rows in ProjectTags (cascade), not the tags themselves.
+            e.HasMany(p => p.Tags)
+                .WithMany(t => t.Projects)
+                .UsingEntity(
+                    "ProjectTags",
+                    tag => tag.HasOne(typeof(Tag)).WithMany().HasForeignKey("TagId").OnDelete(DeleteBehavior.Cascade),
+                    project => project.HasOne(typeof(Project)).WithMany().HasForeignKey("ProjectId").OnDelete(DeleteBehavior.Cascade),
+                    join => join.HasKey("ProjectId", "TagId"));
+        });
+
+        modelBuilder.Entity<Tag>(e =>
+        {
+            e.Property(t => t.Name).HasMaxLength(50);
+            e.HasIndex(t => t.Name).IsUnique();
         });
 
         modelBuilder.Entity<ProjectTranslation>(e =>

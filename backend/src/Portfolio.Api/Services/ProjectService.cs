@@ -1,4 +1,5 @@
 using Portfolio.Api.DTOs;
+using Portfolio.Api.Entities;
 using Portfolio.Api.Mappings;
 using Portfolio.Api.Repositories;
 
@@ -24,6 +25,7 @@ public class ProjectService(IProjectRepository repository) : IProjectService
     public async Task<ProjectDto> CreateAsync(ProjectRequest request, CancellationToken ct = default)
     {
         var project = request.ToEntity();
+        await SetTagsAsync(project, request.Tags, ct);
         await repository.AddAsync(project, ct);
         await repository.SaveChangesAsync(ct);
         return project.ToDto();
@@ -35,7 +37,10 @@ public class ProjectService(IProjectRepository repository) : IProjectService
         if (project is null) return null;
 
         request.ApplyTo(project);
+        await SetTagsAsync(project, request.Tags, ct);
         await repository.SaveChangesAsync(ct);
+        // A tag removed from its last project is deleted.
+        await repository.RemoveUnusedTagsAsync(ct);
         return project.ToDto();
     }
 
@@ -46,6 +51,28 @@ public class ProjectService(IProjectRepository repository) : IProjectService
 
         repository.Remove(project);
         await repository.SaveChangesAsync(ct);
+        await repository.RemoveUnusedTagsAsync(ct);
         return true;
+    }
+
+    public async Task<IReadOnlyList<TagDto>> GetTagsAsync(CancellationToken ct = default) =>
+        await repository.GetTagUsageAsync(ct);
+
+    /// <summary>
+    /// Links the project to the requested tags: an existing tag is reused (one "react" row shared by
+    /// every project), a new one is created; tags missing from the request are unlinked.
+    /// </summary>
+    private async Task SetTagsAsync(Project project, IEnumerable<string>? requested, CancellationToken ct)
+    {
+        var names = ProjectMappings.NormalizeTags(requested);
+
+        project.Tags.RemoveAll(tag => !names.Contains(tag.Name));
+
+        var missing = names.Except(project.Tags.Select(tag => tag.Name)).ToList();
+        if (missing.Count == 0) return;
+
+        var existing = await repository.GetTagsAsync(missing, ct);
+        foreach (var name in missing)
+            project.Tags.Add(existing.Find(tag => tag.Name == name) ?? new Tag { Name = name });
     }
 }

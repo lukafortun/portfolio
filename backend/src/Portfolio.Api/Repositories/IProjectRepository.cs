@@ -1,3 +1,4 @@
+using Portfolio.Api.DTOs;
 using Portfolio.Api.Entities;
 
 namespace Portfolio.Api.Repositories;
@@ -14,4 +15,13 @@ public interface IProjectRepository
     Task AddAsync(Project project, CancellationToken ct = default);
     void Remove(Project project);
     Task SaveChangesAsync(CancellationToken ct = default);
+
+    /// <summary>The tags among <paramref name="names"/> that already exist.</summary>
+    Task<List<Tag>> GetTagsAsync(IReadOnlyCollection<string> names, CancellationToken ct = default);
+
+    /// <summary>Every tag with its number of projects, most used first.</summary>
+    Task<List<TagDto>> GetTagUsageAsync(CancellationToken ct = default);
+
+    /// <summary>Deletes the tags no project uses anymore.</summary>
+    Task RemoveUnusedTagsAsync(CancellationToken ct = default);
 }
