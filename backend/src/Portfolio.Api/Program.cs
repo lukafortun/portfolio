@@ -7,7 +7,8 @@ builder.Services
     .AddDatabase(builder.Configuration)
     .AddRepositories()
     .AddApplicationServices()
-    .AddAdminAuth(builder.Environment, builder.Configuration);
+    .AddAdminAuth(builder.Environment, builder.Configuration)
+    .AddUploads(builder.Configuration);
 
 builder.Services.AddControllers();
 builder.Services.AddProblemDetails();
@@ -27,6 +28,7 @@ else
 }
 
 app.UseHttpsRedirection();
+app.UseUploads();
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -36,6 +38,3 @@ app.MapHealthChecks("/api/health");
 await DatabaseInitializer.InitializeAsync(app.Services);
 
 app.Run();
-
-// Exposes Program to WebApplicationFactory<Program> in the integration tests.
-public partial class Program;

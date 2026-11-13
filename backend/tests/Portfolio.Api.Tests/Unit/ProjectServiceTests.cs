@@ -11,9 +11,24 @@ public class ProjectServiceTests
     private readonly IProjectRepository _repository = Substitute.For<IProjectRepository>();
     private readonly ProjectService _service;
 
-    private static readonly ProjectRequest Request = new("Titre", "Description", "https://github.com/x/y", null);
+    private static readonly ProjectRequest Request = new(
+        "mon-projet",
+        [new("fr", "Titre", "Résumé", "# Contenu"), new("en", "Title", "Summary", "# Content")],
+        "https://github.com/x/y",
+        null);
 
     public ProjectServiceTests() => _service = new ProjectService(_repository);
+
+    private static Project ExistingProject() => new()
+    {
+        Id = 1,
+        Slug = "ancien",
+        Translations =
+        [
+            new() { ProjectId = 1, Language = "fr", Title = "Ancien", Summary = "Ancien résumé", Content = "Ancien contenu" },
+            new() { ProjectId = 1, Language = "en", Title = "Old", Summary = "Old summary", Content = "Old content" },
+        ],
+    };
 
     [Fact]
     public async Task GetByIdAsync_returns_null_when_project_does_not_exist()
@@ -25,28 +40,87 @@ public class ProjectServiceTests
         Assert.Null(result);
     }
 
+    [Theory]
+    [InlineData("en", "en", "Old")]
+    [InlineData("fr", "fr", "Ancien")]
+    [InlineData("en-US", "en", "Old")]
+    [InlineData(null, "fr", "Ancien")]
+    [InlineData("de", "fr", "Ancien")]
+    public async Task GetByIdAsync_returns_requested_language_or_default(string? requested, string expectedLanguage, string expectedTitle)
+    {
+        _repository.GetByIdAsync(1, Arg.Any<CancellationToken>()).Returns(ExistingProject());
+
+        var result = await _service.GetByIdAsync(1, requested);
+
+        Assert.Equal(expectedLanguage, result!.Language);
+        Assert.Equal(expectedTitle, result.Title);
+    }
+
+    [Fact]
+    public async Task GetBySlugAsync_falls_back_to_default_language_when_translation_is_missing()
+    {
+        var project = ExistingProject();
+        project.Translations.RemoveAll(t => t.Language == "en");
+        _repository.GetBySlugAsync("ancien", Arg.Any<CancellationToken>()).Returns(project);
+
+        var result = await _service.GetBySlugAsync("ancien", "en");
+
+        Assert.Equal("fr", result!.Language);
+        Assert.Equal("Ancien contenu", result.Content);
+    }
+
+    [Fact]
+    public async Task GetAllAsync_returns_list_items_with_available_languages()
+    {
+        _repository.GetAllAsync(Arg.Any<CancellationToken>()).Returns([ExistingProject()]);
+
+        var item = Assert.Single(await _service.GetAllAsync("en"));
+
+        Assert.Equal("Old summary", item.Summary);
+        Assert.Equal(["fr", "en"], item.Languages);
+    }
+
     [Fact]
     public async Task CreateAsync_adds_and_saves_then_returns_dto()
     {
         var result = await _service.CreateAsync(Request);
 
-        await _repository.Received(1).AddAsync(Arg.Is<Project>(p => p.Title == "Titre"), Arg.Any<CancellationToken>());
+        await _repository.Received(1).AddAsync(
+            Arg.Is<Project>(p => p.Slug == "mon-projet" && p.Translations.Count == 2),
+            Arg.Any<CancellationToken>());
         await _repository.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
         Assert.Equal("Titre", result.Title);
-        Assert.Equal("https://github.com/x/y", result.RepoUrl);
+        Assert.Equal("# Contenu", result.Content);
+        Assert.Equal(["fr", "en"], result.Translations.Select(t => t.Language));
     }
 
     [Fact]
-    public async Task UpdateAsync_modifies_existing_project()
+    public async Task UpdateAsync_updates_slug_and_translations_in_place()
     {
-        var existing = new Project { Id = 1, Title = "Ancien", Description = "Ancienne" };
+        var existing = ExistingProject();
+        var frRow = existing.Translations[0];
         _repository.GetByIdAsync(1, Arg.Any<CancellationToken>()).Returns(existing);
 
         var result = await _service.UpdateAsync(1, Request);
 
         Assert.NotNull(result);
-        Assert.Equal("Titre", existing.Title);
+        Assert.Equal("mon-projet", existing.Slug);
+        Assert.Same(frRow, existing.Translations.Single(t => t.Language == "fr"));
+        Assert.Equal("# Contenu", frRow.Content);
         await _repository.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task UpdateAsync_removes_translations_missing_from_the_request()
+    {
+        var existing = ExistingProject();
+        _repository.GetByIdAsync(1, Arg.Any<CancellationToken>()).Returns(existing);
+
+        await _service.UpdateAsync(1, Request with { Translations = [new("fr", "Titre", "Résumé", null)] });
+
+        var remaining = Assert.Single(existing.Translations);
+        Assert.Equal("fr", remaining.Language);
+        Assert.Equal("", remaining.Content);
     }
 
     [Fact]
@@ -72,7 +146,7 @@ public class ProjectServiceTests
     [Fact]
     public async Task DeleteAsync_removes_existing_project()
     {
-        var existing = new Project { Id = 1, Title = "T", Description = "D" };
+        var existing = ExistingProject();
         _repository.GetByIdAsync(1, Arg.Any<CancellationToken>()).Returns(existing);
 
         Assert.True(await _service.DeleteAsync(1));

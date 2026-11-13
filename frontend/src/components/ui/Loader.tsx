@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import styles from './Loader.module.css'
 
 const frames = ['|', '/', '-', '\\']
 
 /** ASCII spinner: | / - \ */
-export function Loader({ label = 'chargement' }: { label?: string }) {
+export function Loader({ label }: { label?: string }) {
+  const { t } = useTranslation()
   const [frame, setFrame] = useState(0)
 
   useEffect(() => {
@@ -15,7 +17,7 @@ export function Loader({ label = 'chargement' }: { label?: string }) {
   return (
     <div className={styles.loader} role="status">
       <span className={styles.spinner} aria-hidden>[{frames[frame]}]</span>
-      {label}…
+      {label ?? t('common.loading')}…
     </div>
   )
 }

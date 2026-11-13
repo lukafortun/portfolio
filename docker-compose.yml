@@ -30,8 +30,10 @@ services:
       Authentik__Authority: ${AUTHENTIK_AUTHORITY:-}
       Authentik__ClientId: ${AUTHENTIK_CLIENT_ID:-}
       Authentik__ClientSecret: ${AUTHENTIK_CLIENT_SECRET:-}
+      Uploads__Path: /data/uploads
     volumes:
       - dataprotection:/home/app/.aspnet/DataProtection-Keys
+      - uploads:/data/uploads
 
   web:
     build: ./frontend
@@ -44,3 +46,4 @@ services:
 volumes:
   pgdata:
   dataprotection:
+  uploads:

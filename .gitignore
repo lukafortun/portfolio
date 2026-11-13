@@ -5,6 +5,9 @@ obj/
 .vs/
 TestResults/
 
+# Images uploaded in local development
+backend/src/Portfolio.Api/uploads/
+
 # Node / Vite (see also frontend/.gitignore)
 node_modules/
 dist/

@@ -1,8 +1,8 @@
-import type { Project } from '../../api/projects'
+import type { ProjectListItem } from '../../api/projects'
 import { ProjectCard } from './ProjectCard'
 import styles from './ProjectGrid.module.css'
 
-export function ProjectGrid({ projects }: { projects: Project[] }) {
+export function ProjectGrid({ projects }: { projects: ProjectListItem[] }) {
   return (
     <ul className={styles.grid}>
       {projects.map((project, i) => (

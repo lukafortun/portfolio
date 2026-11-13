@@ -11,9 +11,9 @@ RUN dotnet publish src/Portfolio.Api/Portfolio.Api.csproj -c Release -o /app --n
 FROM mcr.microsoft.com/dotnet/aspnet:10.0
 WORKDIR /app
 
-# Data Protection keys (auth cookie encryption) are persisted in a volume mounted here.
-# Creating the folder with the right owner lets the non-root user write to that volume.
-RUN mkdir -p /home/app/.aspnet/DataProtection-Keys && chown -R $APP_UID /home/app/.aspnet
+# Data Protection keys (auth cookie encryption) and uploaded images are persisted in volumes mounted here.
+# Creating the folders with the right owner lets the non-root user write to those volumes.
+RUN mkdir -p /home/app/.aspnet/DataProtection-Keys /data/uploads && chown -R $APP_UID /home/app/.aspnet /data/uploads
 
 COPY --from=build /app .
 USER $APP_UID

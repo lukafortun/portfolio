@@ -1,2 +1,36 @@
-.form { display: grid; gap: 20px; }
+.form { display: grid; gap: 24px; }
+
+/* One block per language, plus one for the links. */
+.section {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+  margin: 0;
+  padding: 18px 16px 16px;
+  border: 1px dashed var(--border-strong);
+}
+
+.legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 6px;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: lowercase;
+}
+
+.required,
+.optional {
+  padding: 0 5px;
+  font-size: 0.7rem;
+  font-weight: 500;
+}
+.required { border: 1px solid var(--accent); color: var(--accent); }
+.optional { border: 1px solid var(--border-strong); color: var(--muted); }
+
 .actions { display: flex; justify-content: flex-end; gap: 8px; }
+
+/* Higher specificity than Field's ".field textarea" rule. */
+.section textarea.summary { min-height: 0; }

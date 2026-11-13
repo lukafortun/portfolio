@@ -1,0 +1,24 @@
+.field { display: grid; gap: 8px; }
+
+/* Same 16:9 ratio as on the project cards. */
+.frame {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 16 / 9;
+  border: 1px dashed var(--border-strong);
+  background: var(--bg);
+  overflow: hidden;
+}
+.dragging { border-color: var(--accent); background: var(--accent-dim); }
+
+.image { width: 100%; height: 100%; object-fit: cover; }
+
+.placeholder {
+  padding: 16px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.actions { display: flex; gap: 6px; }

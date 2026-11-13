@@ -1,0 +1,55 @@
+.split {
+  display: grid;
+  /* --left is set inline; the 24px middle column is the handle. */
+  grid-template-columns: minmax(0, calc(var(--left) - 12px)) 24px minmax(0, 1fr);
+  gap: 8px;
+}
+
+/* min-width: 0 lets a pane shrink below its content's width (long titles, tables…). */
+.pane { min-width: 0; }
+
+/* Wide invisible hit area, with a thin visible line in the middle. */
+.handle {
+  position: relative;
+  cursor: col-resize;
+  touch-action: none; /* let pointer events drive the drag on touch screens */
+}
+.handle::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  background: var(--border);
+  transition: background-color 0.12s, width 0.12s;
+}
+/* Grip in the middle, terminal style. */
+.handle::after {
+  content: '⋮';
+  position: sticky;
+  top: 50vh;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 32px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg);
+  font-family: var(--font-mono);
+  color: var(--muted);
+}
+
+.handle:hover::before,
+.handle:focus-visible::before,
+.dragging .handle::before { width: 2px; background: var(--accent); }
+.handle:hover::after,
+.handle:focus-visible::after,
+.dragging .handle::after { border-color: var(--accent); color: var(--accent); }
+.handle:focus-visible { outline: none; }
+
+.dragging { cursor: col-resize; user-select: none; }
+
+@media (max-width: 860px) {
+  .split { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+  .handle { display: none; }
+}

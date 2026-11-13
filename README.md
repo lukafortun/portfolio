@@ -143,13 +143,17 @@ As environment variables, replace `:` with `__` (e.g. `Authentik__ClientSecret`)
 | Method | Route | Access |
 |---|---|---|
 | `GET` | `/api/health` | public |
-| `GET` | `/api/projects`, `/api/projects/{id}` | public |
+| `GET` | `/api/projects`, `/api/projects/{id}`, `/api/projects/by-slug/{slug}` | public |
 | `POST` `PUT` `DELETE` | `/api/projects`, `/api/projects/{id}` | admin |
+| `POST` | `/api/uploads` (PNG, JPEG, GIF or WebP, 5 MB max) | admin |
+| `GET` | `/api/uploads/{file}` | public |
 | `GET` | `/api/auth/login` | public (redirects to Authentik) |
 | `POST` | `/api/auth/logout` | public |
 | `GET` | `/api/auth/me` | admin |
 
-"Admin" means signed in and a member of the `portfolio-admins` group. In local development, the OpenAPI document is available at `/openapi/v1.json`.
+"Admin" means signed in and a member of the `portfolio-admins` group.
+
+Each project has a unique slug (its page is `/projects/{slug}`), a short summary for the cards and a Markdown content for its page. Texts are translatable: a `fr` translation is required, `en` is optional. `?lang=en` returns them in English, falling back to French when a project has no English translation. In local development, the OpenAPI document is available at `/openapi/v1.json`.
 
 ## Deploying
 
@@ -157,3 +161,4 @@ As environment variables, replace `:` with `__` (e.g. `Authentik__ClientSecret`)
 - Register the production callback URL `https://<your-domain>/api/auth/callback` in Authentik.
 - Set a strong `POSTGRES_PASSWORD`.
 - Auth cookie encryption keys are stored in the `dataprotection` volume, so sessions survive container restarts.
+- Uploaded images are stored in the `uploads` volume and served at `/api/uploads/…`. Back it up together with the database.

@@ -1,8 +1,10 @@
+import { useTranslation } from 'react-i18next'
 import { Link, useLocation } from 'react-router'
 import { PageHeader } from '../components/ui/PageHeader'
 import styles from './NotFoundPage.module.css'
 
 export function NotFoundPage() {
+  const { t } = useTranslation()
   const { pathname } = useLocation()
 
   return (
@@ -10,13 +12,9 @@ export function NotFoundPage() {
       <PageHeader
         command={`cd ${pathname}`}
         title="404"
-        subtitle={
-          <span className={styles.error}>
-            bash: cd: {pathname}: No such file or directory
-          </span>
-        }
+        subtitle={<span className={styles.error}>{t('notFound.error', { path: pathname })}</span>}
       />
-      <Link to="/" className={styles.back}>← cd ~</Link>
+      <Link to="/" className={styles.back}>{t('notFound.back')}</Link>
     </>
   )
 }

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { ProjectGrid } from '../components/projects/ProjectGrid'
 import { Alert } from '../components/ui/Alert'
 import { EmptyState } from '../components/ui/EmptyState'
@@ -7,26 +8,23 @@ import { useProjects } from '../hooks/useProjects'
 import styles from './HomePage.module.css'
 
 export function HomePage() {
+  const { t } = useTranslation()
   const { projects, error } = useProjects()
 
   return (
     <>
-      <PageHeader
-        command="ls ~/projets"
-        title="Mes projets"
-        subtitle="Une sélection de ce que j’ai pu construire."
-      />
+      <PageHeader command={t('home.command')} title={t('home.title')} subtitle={t('home.subtitle')} />
 
       {error ? (
-        <Alert>Impossible de charger les projets : {error}</Alert>
+        <Alert>{t('home.loadError', { error })}</Alert>
       ) : !projects ? (
         <Loader />
       ) : projects.length === 0 ? (
-        <EmptyState>aucun projet pour l’instant</EmptyState>
+        <EmptyState>{t('home.empty')}</EmptyState>
       ) : (
         <>
           <p className={styles.summary}>
-            total <strong>{projects.length}</strong>
+            {t('home.total')} <strong>{projects.length}</strong>
           </p>
           <ProjectGrid projects={projects} />
         </>

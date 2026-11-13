@@ -1,0 +1,35 @@
+.switcher {
+  display: flex;
+  margin-left: 10px;
+  border: 1px solid var(--border-strong);
+}
+
+.option {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  border: 0;
+  background: none;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--muted);
+  cursor: pointer;
+  transition: background-color 0.12s, color 0.12s;
+}
+.option + .option { border-left: 1px solid var(--border-strong); }
+
+/* Inactive flags are greyed out, terminal style. */
+.option svg { display: block; filter: grayscale(1); opacity: 0.55; transition: filter 0.12s, opacity 0.12s; }
+.option:hover { color: var(--text); background: var(--surface-2); }
+.option:hover svg { opacity: 0.9; }
+
+.active,
+.active:hover { color: var(--accent); background: var(--accent-dim); }
+.active svg { filter: none; opacity: 1; }
+
+.code { text-transform: uppercase; font-weight: 600; }
+
+@media (max-width: 480px) {
+  .code { display: none; }
+}

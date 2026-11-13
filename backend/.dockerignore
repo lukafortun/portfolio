@@ -4,3 +4,4 @@
 tests/
 .vs/
 *.user
+src/Portfolio.Api/uploads/

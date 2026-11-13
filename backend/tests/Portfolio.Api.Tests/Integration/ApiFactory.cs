@@ -24,11 +24,16 @@ public class ApiFactory : WebApplicationFactory<Program>
     // An in-memory SQLite database only lives while its connection stays open.
     private readonly SqliteConnection _connection = new("DataSource=:memory:");
 
+    /// <summary>Uploaded images go to a temporary folder, deleted with the factory.</summary>
+    public string UploadsPath { get; } = Path.Combine(Path.GetTempPath(), $"portfolio-tests-{Guid.NewGuid():N}");
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         _connection.Open();
 
         builder.UseEnvironment("Testing");
+        builder.UseSetting("Uploads:Path", UploadsPath);
+        builder.UseSetting("Uploads:MaxBytes", "1024");
         builder.UseSetting("Authentik:Authority", FakeAuthentik);
         builder.UseSetting("Authentik:ClientId", "test-client");
         builder.UseSetting("Authentik:ClientSecret", "test-secret");
@@ -76,6 +81,8 @@ public class ApiFactory : WebApplicationFactory<Program>
     protected override void Dispose(bool disposing)
     {
         base.Dispose(disposing);
-        if (disposing) _connection.Dispose();
+        if (!disposing) return;
+        _connection.Dispose();
+        if (Directory.Exists(UploadsPath)) Directory.Delete(UploadsPath, recursive: true);
     }
 }

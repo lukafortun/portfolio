@@ -6,14 +6,20 @@ namespace Portfolio.Api.Services;
 
 public class ProjectService(IProjectRepository repository) : IProjectService
 {
-    public async Task<IReadOnlyList<ProjectDto>> GetAllAsync(CancellationToken ct = default)
+    public async Task<IReadOnlyList<ProjectListItemDto>> GetAllAsync(string? language = null, CancellationToken ct = default)
     {
         var projects = await repository.GetAllAsync(ct);
-        return projects.Select(p => p.ToDto()).ToList();
+        return projects.Select(p => p.ToListItem(language)).ToList();
     }
 
-    public async Task<ProjectDto?> GetByIdAsync(int id, CancellationToken ct = default) =>
-        (await repository.GetByIdAsync(id, ct))?.ToDto();
+    public async Task<ProjectDto?> GetByIdAsync(int id, string? language = null, CancellationToken ct = default) =>
+        (await repository.GetByIdAsync(id, ct))?.ToDto(language);
+
+    public async Task<ProjectDto?> GetBySlugAsync(string slug, string? language = null, CancellationToken ct = default) =>
+        (await repository.GetBySlugAsync(slug, ct))?.ToDto(language);
+
+    public Task<bool> IsSlugTakenAsync(string slug, int? exceptId = null, CancellationToken ct = default) =>
+        repository.SlugExistsAsync(slug, exceptId, ct);
 
     public async Task<ProjectDto> CreateAsync(ProjectRequest request, CancellationToken ct = default)
     {
