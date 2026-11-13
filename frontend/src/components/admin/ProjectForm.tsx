@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import type { Project, ProjectInput } from '../../api/projects'
 import { defaultLanguage, languages } from '../../i18n'
-import { readText } from '../../lib/formData'
+import { readTags, readText } from '../../lib/formData'
 import { slugify } from '../../lib/slugify'
 import { Field } from '../ui/Field'
 import { Flag } from '../ui/flags'
@@ -39,8 +39,7 @@ function readInput(form: FormData): ProjectInput {
     repoUrl: readText(form, 'repoUrl') || null,
     liveUrl: readText(form, 'liveUrl') || null,
     coverImage: readText(form, 'coverImage') || null,
-    // "#react #docker", "react, docker"… the API normalizes them (lowercase, no "#").
-    tags: readText(form, 'tags').split(/[\s,]+/).filter(Boolean),
+    tags: readTags(form, 'tags'),
   }
 }
 
@@ -100,7 +99,7 @@ export function ProjectForm({ project, onSubmit, onCancel }: Props) {
           <CoverImageField name="coverImage" defaultValue={project?.coverImage} />
         </Field>
         {/* as="div": the field holds buttons (remove a tag), a <label> wrapper would also trigger them. */}
-        <Field as="div" label={t('form.tags')} hint={t('form.projectTagsHint')}>
+        <Field as="div" label={t('form.tags')} hint={t('form.tagsHint', { max: 15 })}>
           <TagInput name="tags" label={t('form.tags')} defaultValue={project?.tags} />
         </Field>
         <Field label={t('form.slug')} hint={t('form.slugHint')}>

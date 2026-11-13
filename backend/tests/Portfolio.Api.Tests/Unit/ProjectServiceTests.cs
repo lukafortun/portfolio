@@ -9,6 +9,7 @@ namespace Portfolio.Api.Tests.Unit;
 public class ProjectServiceTests
 {
     private readonly IProjectRepository _repository = Substitute.For<IProjectRepository>();
+    private readonly ITagService _tags = Substitute.For<ITagService>();
     private readonly ProjectService _service;
 
     private static readonly ProjectRequest Request = new(
@@ -17,7 +18,7 @@ public class ProjectServiceTests
         "https://github.com/x/y",
         null);
 
-    public ProjectServiceTests() => _service = new ProjectService(_repository);
+    public ProjectServiceTests() => _service = new ProjectService(_repository, _tags);
 
     private static Project ExistingProject() => new()
     {
@@ -111,36 +112,19 @@ public class ProjectServiceTests
     }
 
     [Fact]
-    public async Task CreateAsync_reuses_existing_tags_and_creates_missing_ones()
-    {
-        var react = new Tag { Id = 7, Name = "react" };
-        _repository.GetTagsAsync(Arg.Any<IReadOnlyCollection<string>>(), Arg.Any<CancellationToken>()).Returns([react]);
-
-        await _service.CreateAsync(Request with { Tags = ["#React", "docker"] });
-
-        await _repository.Received(1).AddAsync(
-            Arg.Is<Project>(p => p.Tags.Count == 2
-                && p.Tags.Contains(react)                                  // same row, not a second "react"
-                && p.Tags.Any(t => t.Name == "docker" && t.Id == 0)),     // new row, inserted on save
-            Arg.Any<CancellationToken>());
-    }
-
-    [Fact]
-    public async Task UpdateAsync_unlinks_removed_tags_then_deletes_unused_ones()
+    public async Task UpdateAsync_syncs_tags_then_deletes_unused_ones_after_saving()
     {
         var existing = ExistingProject();
-        existing.Tags = [new() { Id = 1, Name = "react" }, new() { Id = 2, Name = "vue" }];
         _repository.GetByIdAsync(1, Arg.Any<CancellationToken>()).Returns(existing);
 
         await _service.UpdateAsync(1, Request with { Tags = ["react"] });
 
-        Assert.Equal(["react"], existing.Tags.Select(t => t.Name));
-        // Nothing to look up: "react" is already linked.
-        await _repository.DidNotReceive().GetTagsAsync(Arg.Any<IReadOnlyCollection<string>>(), Arg.Any<CancellationToken>());
+        // Unused tags can only be found once the unlinking is saved.
         Received.InOrder(() =>
         {
+            _tags.SyncAsync(existing.Tags, Arg.Is<IEnumerable<string>>(t => t.SequenceEqual(new[] { "react" })), Arg.Any<CancellationToken>());
             _repository.SaveChangesAsync(Arg.Any<CancellationToken>());
-            _repository.RemoveUnusedTagsAsync(Arg.Any<CancellationToken>());
+            _tags.RemoveUnusedAsync(Arg.Any<CancellationToken>());
         });
     }
 

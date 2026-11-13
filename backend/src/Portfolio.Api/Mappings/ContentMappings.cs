@@ -36,7 +36,7 @@ public static class ContentMappings
     // ---------- Experience ----------
 
     public static ExperienceDto ToDto(this Experience x) =>
-        new(x.Id, x.Start, x.End, x.Company, x.Role, x.Location, x.Description, x.Tags);
+        new(x.Id, x.Start, x.End, x.Company, x.Role, x.Location, x.Description, x.Tags.ToNames());
 
     public static void ApplyTo(this ExperienceRequest r, Experience x)
     {
@@ -46,7 +46,7 @@ public static class ContentMappings
         x.Role = Clean(r.Role);
         x.Location = Clean(r.Location);
         x.Description = Clean(r.Description);
-        x.Tags = CleanList(r.Tags);
+        // Tags are set by ExperienceService: existing Tag rows must be loaded from the database first.
     }
 
     // ---------- Helpers ----------

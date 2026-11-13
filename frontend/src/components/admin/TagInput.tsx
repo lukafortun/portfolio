@@ -15,8 +15,8 @@ type Props = {
   max?: number
 }
 
-/** A suggestion: an existing tag, or the typed text as a new one. */
-type Option = { name: string; projectCount: number | null }
+/** A suggestion: an existing tag with its number of uses (projects + experience entries), or the typed text as a new one. */
+type Option = { name: string; uses: number | null }
 
 const maxSuggestions = 8
 
@@ -45,9 +45,10 @@ export function TagInput({ name, label, defaultValue = [], max = 15 }: Props) {
     .filter((tag) => !tags.includes(tag.name) && tag.name.includes(query))
     .sort((a, b) => Number(b.name.startsWith(query)) - Number(a.name.startsWith(query)))
     .slice(0, maxSuggestions)
+    .map((tag) => ({ name: tag.name, uses: tag.projectCount + tag.experienceCount }))
   // The typed text, when it is a new tag.
   if (query && !tags.includes(query) && !existing?.some((tag) => tag.name === query)) {
-    options.push({ name: query, projectCount: null })
+    options.push({ name: query, uses: null })
   }
 
   const visible = open && !full && options.length > 0
@@ -184,9 +185,7 @@ export function TagInput({ name, label, defaultValue = [], max = 15 }: Props) {
                 {option.name}
               </span>
               <span className={styles.count}>
-                {option.projectCount === null
-                  ? t('form.newTag')
-                  : t('form.tagUses', { count: option.projectCount })}
+                {option.uses === null ? t('form.newTag') : t('form.tagUses', { count: option.uses })}
               </span>
             </li>
           ))}

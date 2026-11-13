@@ -145,7 +145,7 @@ As environment variables, replace `:` with `__` (e.g. `Authentik__ClientSecret`)
 | `GET` | `/api/health` | public |
 | `GET` | `/api/projects`, `/api/projects/{id}`, `/api/projects/by-slug/{slug}` | public |
 | `POST` `PUT` `DELETE` | `/api/projects`, `/api/projects/{id}` | admin |
-| `GET` | `/api/tags` (project tags with their project count) | public |
+| `GET` | `/api/tags` (tags with their number of projects and experience entries) | public |
 | `GET` | `/api/profile`, `/api/skills`, `/api/experiences` | public |
 | `PUT` | `/api/profile` | admin |
 | `POST` `PUT` `DELETE` | `/api/skills`, `/api/skills/{id}`, `/api/experiences`, `/api/experiences/{id}` | admin |
@@ -159,7 +159,7 @@ As environment variables, replace `:` with `__` (e.g. `Authentik__ClientSecret`)
 
 All the content (profile, skills, experience and projects) is stored in the database and edited from the admin area (`/admin`). On first start, an empty database is filled with example content to replace.
 
-Each project has a unique slug (its page is `/projects/{slug}`), a short summary for the cards, a Markdown content for its page and tags (`#react`, `#docker`…: stored lowercase without `#`, they filter the project list with `/projects?tag=react`). Texts are translatable: a `fr` translation is required, `en` is optional. `?lang=en` returns them in English, falling back to French when a project has no English translation. In local development, the OpenAPI document is available at `/openapi/v1.json`.
+Each project has a unique slug (its page is `/projects/{slug}`), a short summary for the cards, a Markdown content for its page and tags (`#react`, `#docker`…: stored lowercase without `#`, they filter the project list with `/projects?tag=react`). Experience entries use the same tags (one `Tags` table, linked through `ProjectTags` and `ExperienceTags`); a tag nothing uses anymore is deleted. Texts are translatable: a `fr` translation is required, `en` is optional. `?lang=en` returns them in English, falling back to French when a project has no English translation. In local development, the OpenAPI document is available at `/openapi/v1.json`.
 
 ## Deploying
 

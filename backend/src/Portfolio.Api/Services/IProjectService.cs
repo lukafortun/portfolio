@@ -23,7 +23,4 @@ public interface IProjectService
 
     /// <returns>false if the project does not exist.</returns>
     Task<bool> DeleteAsync(int id, CancellationToken ct = default);
-
-    /// <summary>Every tag in use, most used first.</summary>
-    Task<IReadOnlyList<TagDto>> GetTagsAsync(CancellationToken ct = default);
 }

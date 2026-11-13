@@ -1,8 +1,8 @@
 namespace Portfolio.Api.Entities;
 
 /// <summary>
-/// A project tag ("react", "docker"). A tag is shared by every project that uses it:
-/// projects and tags are linked through the ProjectTags join table (ProjectId, TagId).
+/// A tag ("react", "docker"), shared by projects and experience entries: one row per tag,
+/// linked through the ProjectTags (ProjectId, TagId) and ExperienceTags (ExperienceId, TagId) join tables.
 /// </summary>
 public class Tag
 {
@@ -12,4 +12,5 @@ public class Tag
     public required string Name { get; set; }
 
     public List<Project> Projects { get; set; } = [];
+    public List<Experience> Experiences { get; set; } = [];
 }

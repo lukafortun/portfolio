@@ -168,13 +168,12 @@ export const en: Translations = {
     endHint: 'Leave empty if ongoing',
     company: 'company',
     tags: 'tags',
-    tagsHint: 'Separated by commas (optional)',
-    projectTagsHint:
-      'Enter, space or comma to validate; ↑ ↓ to pick an existing tag. A dash for a two-word tag (spring-boot). 15 max.',
+    tagsHint:
+      'Enter, space or comma to validate; ↑ ↓ to pick an existing tag. A dash for a two-word tag (spring-boot). {{max}} max.',
     removeTag: 'Remove #{{tag}}',
     newTag: 'new',
-    tagUses_one: '{{count}} project',
-    tagUses_other: '{{count}} projects',
+    tagUses_one: 'used once',
+    tagUses_other: 'used {{count}} times',
     tagsFull: '{{max}} tags maximum',
     cancel: 'cancel',
     submitting: 'sending…',

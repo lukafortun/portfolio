@@ -18,7 +18,8 @@
   text-decoration: none;
   transition: color 0.12s;
 }
-.tag:hover { color: var(--accent); text-decoration: underline; }
+/* Only the links react on hover (a tag without projects is plain text). */
+a.tag:hover { color: var(--accent); text-decoration: underline; }
 
 .hash { color: var(--accent); opacity: 0.7; }
 

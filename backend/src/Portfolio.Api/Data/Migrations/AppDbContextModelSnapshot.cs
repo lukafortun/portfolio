@@ -22,6 +22,21 @@ namespace Portfolio.Api.Data.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("ExperienceTags", b =>
+                {
+                    b.Property<int>("ExperienceId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TagId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("ExperienceId", "TagId");
+
+                    b.HasIndex("TagId");
+
+                    b.ToTable("ExperienceTags");
+                });
+
             modelBuilder.Entity("Portfolio.Api.Entities.Experience", b =>
                 {
                     b.Property<int>("Id")
@@ -55,10 +70,6 @@ namespace Portfolio.Api.Data.Migrations
                         .IsRequired()
                         .HasMaxLength(7)
                         .HasColumnType("character varying(7)");
-
-                    b.Property<string>("Tags")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -227,6 +238,21 @@ namespace Portfolio.Api.Data.Migrations
                     b.HasIndex("TagId");
 
                     b.ToTable("ProjectTags");
+                });
+
+            modelBuilder.Entity("ExperienceTags", b =>
+                {
+                    b.HasOne("Portfolio.Api.Entities.Experience", null)
+                        .WithMany()
+                        .HasForeignKey("ExperienceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Portfolio.Api.Entities.Tag", null)
+                        .WithMany()
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Portfolio.Api.Entities.ProjectTranslation", b =>

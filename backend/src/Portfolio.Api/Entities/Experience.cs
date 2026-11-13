@@ -18,6 +18,6 @@ public class Experience
     public Dictionary<string, string> Location { get; set; } = [];
     public Dictionary<string, string> Description { get; set; } = [];
 
-    /// <summary>Stored as JSON.</summary>
-    public List<string> Tags { get; set; } = [];
+    /// <summary>Same tags as the projects, through the ExperienceTags join table.</summary>
+    public List<Tag> Tags { get; set; } = [];
 }

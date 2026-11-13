@@ -167,13 +167,12 @@ export const fr = {
     endHint: 'Laisser vide si en cours',
     company: 'entreprise',
     tags: 'tags',
-    tagsHint: 'Séparés par des virgules (optionnel)',
-    projectTagsHint:
-      'Entrée, espace ou virgule pour valider ; ↑ ↓ pour choisir parmi les tags existants. Un tiret pour un tag en deux mots (spring-boot). 15 max.',
+    tagsHint:
+      'Entrée, espace ou virgule pour valider ; ↑ ↓ pour choisir parmi les tags existants. Un tiret pour un tag en deux mots (spring-boot). {{max}} max.',
     removeTag: 'Retirer #{{tag}}',
     newTag: 'nouveau',
-    tagUses_one: '{{count}} projet',
-    tagUses_other: '{{count}} projets',
+    tagUses_one: 'utilisé 1 fois',
+    tagUses_other: 'utilisé {{count}} fois',
     tagsFull: '{{max}} tags maximum',
     cancel: 'annuler',
     submitting: 'envoi…',

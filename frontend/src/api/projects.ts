@@ -46,11 +46,11 @@ export type ProjectInput = {
   tags: string[]
 }
 
-/** A tag and the number of projects using it. */
-export type TagUsage = { name: string; projectCount: number }
+/** A tag (shared by projects and experience entries) and where it is used. */
+export type TagUsage = { name: string; projectCount: number; experienceCount: number }
 
 export const tagsApi = {
-  /** Every tag in use, most used first. */
+  /** Every tag in use, most used first (projects + experience entries). */
   list: () => request<TagUsage[]>('/tags'),
 }
 

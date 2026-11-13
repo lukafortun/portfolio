@@ -43,8 +43,6 @@ public record ProjectDto(
     IReadOnlyList<ProjectTranslationDto> Translations,
     IReadOnlyList<string> Tags);
 
-/// <summary>A tag and the number of projects using it (suggestions in the admin form).</summary>
-public record TagDto(string Name, int ProjectCount);
 
 public record ProjectRequest(
     [Required, StringLength(100), RegularExpression(ProjectRequest.SlugPattern, ErrorMessage = ProjectRequest.SlugError)]

@@ -62,6 +62,12 @@ public static class ContentSeeder
                 Skills = ["Docker", "Docker Compose", "nginx", "Git", "Linux"],
             });
 
+        // One Tag object per name, shared by every entry using it: two "new Tag { Name = "docker" }"
+        // would insert two rows and break the unique index on Name.
+        var tags = new Dictionary<string, Tag>();
+        List<Tag> Tags(params string[] names) =>
+            names.Select(name => tags.TryGetValue(name, out var tag) ? tag : tags[name] = new Tag { Name = name }).ToList();
+
         db.Experiences.AddRange(
             new Experience
             {
@@ -74,7 +80,7 @@ public static class ContentSeeder
                     ["fr"] = "Développement d’applications web avec React et ASP.NET Core : conception d’API, base de données, tests et déploiement.",
                     ["en"] = "Building web applications with React and ASP.NET Core: API design, database, tests and deployment.",
                 },
-                Tags = ["React", "C#", "ASP.NET Core", "PostgreSQL"],
+                Tags = Tags("react", "csharp", "dotnet", "postgresql"),
             },
             new Experience
             {
@@ -87,7 +93,7 @@ public static class ContentSeeder
                     ["fr"] = "Participation au développement d’un outil interne, de la maquette à la mise en production.",
                     ["en"] = "Took part in building an internal tool, from mock-up to production.",
                 },
-                Tags = ["TypeScript", "Docker"],
+                Tags = Tags("typescript", "docker"),
             },
             new Experience
             {

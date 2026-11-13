@@ -82,7 +82,15 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.Property(x => x.Role).HasJsonConversion();
             e.Property(x => x.Location).HasJsonConversion();
             e.Property(x => x.Description).HasJsonConversion();
-            e.Property(x => x.Tags).HasJsonConversion();
+
+            // Same tags as the projects, through ExperienceTags (ExperienceId, TagId).
+            e.HasMany(x => x.Tags)
+                .WithMany(t => t.Experiences)
+                .UsingEntity(
+                    "ExperienceTags",
+                    tag => tag.HasOne(typeof(Tag)).WithMany().HasForeignKey("TagId").OnDelete(DeleteBehavior.Cascade),
+                    experience => experience.HasOne(typeof(Experience)).WithMany().HasForeignKey("ExperienceId").OnDelete(DeleteBehavior.Cascade),
+                    join => join.HasKey("ExperienceId", "TagId"));
         });
     }
 }
