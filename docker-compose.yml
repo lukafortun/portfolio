@@ -16,6 +16,9 @@ services:
       retries: 10
 
   api:
+    # Built by the CI (see .github/workflows/ci.yml): "docker compose pull" fetches it,
+    # "docker compose up --build" builds it from the sources instead.
+    image: ghcr.io/lukafortun/portfolio-api:${IMAGE_TAG:-latest}
     build: ./backend
     restart: unless-stopped
     depends_on:
@@ -36,6 +39,7 @@ services:
       - uploads:/data/uploads
 
   web:
+    image: ghcr.io/lukafortun/portfolio-web:${IMAGE_TAG:-latest}
     build: ./frontend
     restart: unless-stopped
     depends_on:
